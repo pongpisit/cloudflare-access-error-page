@@ -24,7 +24,17 @@ async function getDenyReasonInfo(originalUrl) {
     const query = originalUrl ? '?original_url=' + encodeURIComponent(originalUrl) : '';
     const response = await fetch('/cf-access/api/denyreason' + query);
     if (!response.ok) {
-        throw new Error('Deny reason fetch failed: ' + response.status);
+        let code = null;
+        try {
+            const body = await response.json();
+            code = body.code || null;
+        } catch (parseError) {
+            code = null;
+        }
+        const error = new Error('Deny reason fetch failed: ' + response.status);
+        error.status = response.status;
+        error.code = code;
+        throw error;
     }
     return await response.json();
 }

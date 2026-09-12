@@ -65,6 +65,13 @@ npm run deploy
 
 The committed `wrangler.jsonc` works out of the box: the Worker is served on your `*.workers.dev` subdomain. To serve it on your own domain instead, add a route to `wrangler.jsonc` (an example is included as a comment) or via the dashboard — the pattern must cover `/cf-access*` so the page, its `/api/*` and `/scripts/*` paths are all routed.
 
+> ⚠️ **Important — the `*.workers.dev` URL cannot show deny reasons.** The page resolves your identity and the denying policy through Cloudflare Access (`Cf-Access-Jwt-Assertion` header and `/cdn-cgi/access/get-identity`), which only exist on Access-protected custom domains. On `workers.dev` the page renders but shows "No Cloudflare Access session on this page". For the page to work:
+>
+> 1. **Bind the Worker to a custom domain** — add a route (e.g. `access.example.com/cf-access*`) in `wrangler.jsonc` or the dashboard
+> 2. **Protect that domain with an Access application** — create a self-hosted Access app for the page's hostname (it can simply Allow `Everyone`; it exists so the page inherits an Access session)
+> 3. **Use the same cookie domain** as the applications that redirect to it (e.g. cookie domain `.example.com`), so a user blocked from `app.example.com` arrives at `access.example.com/cf-access/` already signed in
+> 4. Then set the block-page redirects (step 3 below) to the custom-domain page URL
+
 ### 2. Create the API token and secret
 
 Create an API token (Cloudflare dashboard → My Profile → API Tokens) with:

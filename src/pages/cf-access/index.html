@@ -1006,6 +1006,9 @@
 
         if (!data || data.error) {
             tile.classList.add('error');
+            const hintText = data && data.hint
+                ? `<div class="reason-details" style="margin-top: 8px;">${esc(data.hint)}</div>`
+                : '';
             content.innerHTML = `
                 <div class="error-message">
                     <svg class="status-icon error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1013,6 +1016,7 @@
                     </svg>
                     <span>${esc(data && data.error ? data.error : 'Failed to load deny reason')}</span>
                 </div>
+                ${hintText}
             `;
             return;
         }
@@ -1293,9 +1297,25 @@
             renderReasonInfo(denyReasonData);
             renderFailedLogins(denyReasonData);
         } catch (error) {
-            renderReasonInfo({ error: 'Failed to load deny reason' });
+            renderReasonInfo(denyErrorData(error));
             renderFailedLogins(null);
         }
+    }
+
+    function denyErrorData(error) {
+        if (error && (error.status === 401 || error.code === 'missing_access_jwt')) {
+            return {
+                error: 'No Cloudflare Access session on this page',
+                hint: 'Your identity could not be verified because this page is not being served behind Cloudflare Access. The deny reason only works when the page is deployed on a domain protected by Access in the same Zero Trust organization as the application you were blocked from (for example https://access.example.com/cf-access/). If you are seeing this on a *.workers.dev URL, that is the cause — bind the Worker to your Access-protected domain and point the Access block-page redirects there.'
+            };
+        }
+        if (error && (error.status === 500 || error.code === 'identity_unavailable')) {
+            return {
+                error: 'Access session could not be resolved',
+                hint: 'The worker could not read your identity. This happens when the page is not deployed on an Access-protected custom domain — /cdn-cgi/access/get-identity does not exist on *.workers.dev. If you are the administrator, bind the Worker to your domain behind Access and open the page from there.'
+            };
+        }
+        return { error: 'Failed to load deny reason' };
     }
 
     async function loadData() {

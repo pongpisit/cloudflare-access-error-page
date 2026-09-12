@@ -92,9 +92,10 @@ async function getIdentityFromJWT(request) {
     });
   } catch (error) {
     console.error('Error fetching identity:', error);
-    return new Response(JSON.stringify({ 
+    return new Response(JSON.stringify({
       error: "Failed to fetch identity data",
-      details: error.message 
+      code: "identity_unavailable",
+      details: error.message
     }), {
       status: 500,
       headers: {
@@ -167,11 +168,11 @@ async function fetchDevicePosture(gateway_account_id, device_id, bearerToken) {
 // Handle /api/userdetails - combines identity, device details, and posture
 async function handleUserDetails(request, env) {
   const jwtAssertion = request.headers.get("Cf-Access-Jwt-Assertion");
-  
+
   if (!jwtAssertion) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+    return new Response(JSON.stringify({ error: "Unauthorized", code: "missing_access_jwt" }), {
       status: 401,
-      headers: { 'content-type': 'application/json' },
+      headers: { 'content-type': 'application/json', 'cache-control': 'no-store' },
     });
   }
 
@@ -276,7 +277,7 @@ async function handleDenyReason(request, env) {
   const jwtAssertion = request.headers.get("Cf-Access-Jwt-Assertion");
 
   if (!jwtAssertion) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+    return new Response(JSON.stringify({ error: "Unauthorized", code: "missing_access_jwt" }), {
       status: 401,
       headers: { 'content-type': 'application/json', 'cache-control': 'no-store' },
     });
