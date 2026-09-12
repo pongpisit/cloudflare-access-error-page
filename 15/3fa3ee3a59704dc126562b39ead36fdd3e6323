@@ -1,0 +1,19 @@
+.gitignore
+  s_e12171850038a7::t_044b04032e9552 33-35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "153fa3ee3a59704dc126562b39ead36fdd3e6323",
+  "prompts": {},
+  "sessions": {
+    "s_e12171850038a7": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_f706dc145ffe05CS9weB2dai7f",
+        "model": "@cf/zai-org/glm-5.3"
+      },
+      "human_author": "pongpisit <pongpisit@cloudflare.com>"
+    }
+  }
+}
