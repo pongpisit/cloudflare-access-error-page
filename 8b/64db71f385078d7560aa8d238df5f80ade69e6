@@ -1,0 +1,19 @@
+package-lock.json
+  s_e12171850038a7::t_4151634fa30eeb 13-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "8b64db71f385078d7560aa8d238df5f80ade69e6",
+  "prompts": {},
+  "sessions": {
+    "s_e12171850038a7": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_f706dc145ffe05CS9weB2dai7f",
+        "model": "@cf/zai-org/glm-5.3"
+      },
+      "human_author": "pongpisit <pongpisit@cloudflare.com>"
+    }
+  }
+}
