@@ -30,3 +30,6 @@ Thumbs.db
 .env
 .env.local
 .dev.vars
+
+# Local deploy scratch
+wdev/
