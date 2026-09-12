@@ -1075,7 +1075,7 @@
             const onWorkersDev = /\.workers\.dev$/i.test(String(host));
             const hint = onWorkersDev
                 ? 'Your identity could not be verified because this page is served on a *.workers.dev URL, which cannot be placed behind Cloudflare Access. Bind the Worker to your Access-protected custom domain and point the Access block-page redirects there.'
-                : 'Your identity could not be verified because requests to ' + host + ' are not passing through Cloudflare Access, and no Access session cookie was sent to this page. Fix either way: (a) create a self-hosted Access application for ' + host + ' with the path left empty, or (b) set the Zero Trust cookie domain to your parent domain — the page then validates your existing session from the blocked application automatically.';
+                : 'Your identity could not be verified because requests to ' + host + ' are not passing through Cloudflare Access. Fix: create a self-hosted Access application for ' + host + ' (Zero Trust \u2192 Access controls \u2192 Applications \u2192 Add an application \u2192 Self-hosted; this hostname with the path left empty) with an Allow policy such as Include \u2192 Everyone. Blocked users bounce through the team SSO once, without re-entering credentials, and this page then shows their exact deny reason.';
             return {
                 error: 'No Cloudflare Access session on this page',
                 stamp: 'No session',
