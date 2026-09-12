@@ -2,7 +2,7 @@
 
 DNS filtering visibility and custom pages for Cloudflare Zero Trust, deployed as a single Cloudflare Worker.
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/leelakanakala/cfone-custom-pages)
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/pongpisit/cloudflare-custom-pages)
 
 ## Prerequisites
 
@@ -112,7 +112,7 @@ Set these using `wrangler secret put <SECRET_NAME>`:
 ## Project Structure
 
 ```
-cfone-custom-pages/
+cloudflare-custom-pages/
 ├── src/
 │   ├── pages/
 │   │   ├── cf-dns-dashboard/       # DNS analytics dashboard

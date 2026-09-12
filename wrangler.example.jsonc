@@ -1,6 +1,6 @@
 {
   // Cloudflare Worker Configuration
-  "name": "cfone-custom-pages",
+  "name": "cloudflare-custom-pages",
   "main": "main.js",
   "compatibility_date": "2024-01-01",
   
