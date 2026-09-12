@@ -1,0 +1,19 @@
+wdev/wrangler.jsonc
+  s_e12171850038a7::t_aebc2abbd514ce 1-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "57c6d269056122bddbdce6e7992462c8848ed4ae",
+  "prompts": {},
+  "sessions": {
+    "s_e12171850038a7": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_f706dc145ffe05CS9weB2dai7f",
+        "model": "@cf/zai-org/glm-5.3"
+      },
+      "human_author": "pongpisit <pongpisit@cloudflare.com>"
+    }
+  }
+}
