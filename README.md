@@ -28,12 +28,12 @@ User sees a plain-language reason, what to do next, and their details
 
 A single-column incident record, ordered for a person who just lost access — verdict first, next steps second, evidence after:
 
-**Verdict panel** — the exact reason, one of:
+**Verdict panel** — the reason category, one of:
 
 | Reason type | Meaning |
 |-------------|---------|
-| `blocked_by_deny_policy` | A Block (Deny) policy matched your account or network — the policy name and trigger are shown |
-| `no_allow_policy_matched` | You authenticated, but no Allow policy includes your account — each policy's requirements are compared against your identity |
+| `blocked_by_deny_policy` | A Block (Deny) policy matched your account or network |
+| `no_allow_policy_matched` | You authenticated, but no Allow policy includes your account |
 | `requirement_not_met` | Your account is allowed, but an extra requirement (MFA, client certificate) was not satisfied |
 | `posture_check_failed` | Your device failed required posture checks (CrowdStrike, OS updates, disk encryption) |
 | `session_issue` | You meet the requirements, but your session was rejected or expired |
@@ -41,19 +41,19 @@ A single-column incident record, ordered for a person who just lost access — v
 
 - **Status stamp** — quick-scan verdict (*Blocked by policy*, *Not on the allow list*, *Device failed checks*, …) with the Cloudflare error code
 - **What to do next** — numbered steps written for the person staring at the page
-- **Requirements ledger** — a "Required vs. You" comparison, e.g. *Policy "Engineering-only" requires members of Access group "Engineering" — your groups: Sales, Marketing*
-- **Failing device checks** — listed with fix hints
-- **Your credentials** — You / Device / Posture cards with status pills
+- **Your credentials** — three cards: **You** (name, email, groups, Cloudflare One client status), **Device** (ID, name, model, OS, serial), **Posture** — *every* device posture check with a Passed/Failed pill, not just a fixed few
 - **Recent failed sign-ins** — the user's failed Access login events from the last 15 minutes (application, identity provider, country, reason)
 - **Actions** — *Try the app again*, *Email IT*, *Copy details for IT*, prefilled with the full context (reason, error code, application, email, failing checks)
 - Light/dark themes, keyboard accessible (WCAG 2.1 AA patterns), zero external CDN dependencies (all fonts and styles are local)
+
+**Privacy by design — your policies are never exposed.** The worker evaluates the application's policies server-side, but only returns the *reason category* and the user's own identity/device/posture status. Policy names, rules, allowed email domains, groups, and requirement details stay on the server — blocked users (or anyone inspecting the network tab) cannot read your organization's policy configuration.
 
 Everything degrades gracefully: with no API token (or missing permissions) the page still works, showing identity and posture data with generic guidance.
 
 ## Prerequisites
 
 - Cloudflare account with **Zero Trust (Cloudflare One)** enabled
-- A hostname to serve this page on, itself behind Cloudflare Access with cookie domain `.example.com` (wildcard, so the session carries over)
+- A hostname to serve this page on, protected by its own Cloudflare Access application (see [Setup](#setup) below)
 - Node.js 18+ (local development only)
 
 ## Setup
@@ -120,14 +120,15 @@ Access appends the `original_url` parameter to the redirect — the page uses it
 
 ## How the reason is determined
 
-Cloudflare does not expose which specific policy failed. This page derives it:
+Cloudflare does not expose which specific policy failed. The worker derives the reason category server-side:
 
 1. `original_url` from the Access redirect identifies the application
 2. The application's policies are fetched from the Cloudflare API
 3. `include` / `exclude` / `require` rules are evaluated locally against the user's identity, groups, country (`request.cf.country`) and IP (`CF-Connecting-IP`)
 4. Failing device posture checks and recent failed sign-ins are correlated
+5. Only the resulting **reason category** is returned to the browser — policy names, rules, and requirement text stay on the server and are never sent to the client
 
-Rules that cannot be evaluated locally (MFA, service tokens, external evaluation) are surfaced as unmet additional requirements instead of silently ignored.
+Rules that cannot be evaluated locally (MFA, service tokens, external evaluation) are treated as potential unmet requirements when deciding the category.
 
 ## Project structure
 

@@ -351,7 +351,6 @@ async function handleDenyReason(request, env) {
   const capabilities = { policyEvaluation: false, loginHistory: false, devicePosture: false };
   let failingPostureChecks = [];
   let app = null;
-  let requirements = [];
   let reason = null;
   let failedLogins = [];
 
@@ -385,7 +384,6 @@ async function handleDenyReason(request, env) {
           const groupsMap = await fetchAccessGroupsMap(accountId, found, bearerToken);
           const ctx = buildEvalContext(email, userGroups, clientCountry, clientIp);
           const outcome = evaluateAccessPolicies(policies, groupsMap, ctx);
-          requirements = outcome.allowRequirements;
           const postureNote = failingPostureChecks.length
             ? ` Your device is also failing these posture checks: ${failingPostureChecks.map(c => c.name).join(', ')}.`
             : '';
@@ -395,27 +393,21 @@ async function handleDenyReason(request, env) {
               type: 'blocked_by_deny_policy',
               errorCode: 10204,
               headline: 'A Block policy denied your request',
-              details: `The Access policy "${outcome.matchedDeny.name}" on ${app.name} specifically blocks ${outcome.matchedDeny.trigger}. Contact your IT team if you believe this is a mistake.`,
-              policyName: outcome.matchedDeny.name,
-              trigger: outcome.matchedDeny.trigger,
+              details: `A Block policy on ${app.name} matched your account or network on purpose. If you believe this is a mistake, contact your IT team.`,
             };
           } else if (outcome.allowPolicyCount > 0 && !outcome.matchedAllow && outcome.requirementCandidates.length === 0) {
-            const policyWord = outcome.allowPolicyCount === 1 ? 'policy' : 'policies';
             reason = {
               type: 'no_allow_policy_matched',
               errorCode: 10204,
               headline: `No Allow policy on ${app.name} includes your account`,
-              details: `You signed in as ${email || 'an unknown account'}, but none of the ${outcome.allowPolicyCount} Allow ${policyWord} for this application match your identity, groups, or network.${postureNote}`,
+              details: `You signed in as ${email || 'an unknown account'}, but no Allow policy for this application includes your identity or network.${postureNote}`,
             };
           } else if (outcome.requirementCandidates.length > 0 && !outcome.matchedAllow) {
-            const candidate = outcome.requirementCandidates[0];
             reason = {
               type: 'requirement_not_met',
               errorCode: 10204,
               headline: 'Your account is allowed, but an extra requirement was not met',
-              details: `The Allow policy "${candidate.name}" matched your account but also requires: ${candidate.unmet.join('; ')}.`,
-              policyName: candidate.name,
-              unmet: candidate.unmet,
+              details: 'Your account is allowed, but an additional sign-in requirement was not satisfied — for example MFA or a client certificate. Try signing in again and complete any prompts.',
             };
           }
         }
@@ -471,7 +463,6 @@ async function handleDenyReason(request, env) {
       groups: userGroups.map(g => g.name || g.email || g.id).filter(Boolean),
       country: clientCountry,
     },
-    requirements,
     failingPostureChecks,
     failedLogins,
     capabilities,

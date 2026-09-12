@@ -16,8 +16,8 @@
         --paper: #f4f6f3;
         --card: #ffffff;
         --ink: #191d1b;
-        --muted: #5d6660;
-        --faint: #8a938d;
+        --muted: #454e49;
+        --faint: #666f6a;
         --line: #e0e4de;
         --line-strong: #c9cec7;
         --amber: #b45309;
@@ -25,7 +25,7 @@
         --red: #b91c1c;
         --green: #15803d;
         --stamp-bg: rgba(180, 83, 9, 0.07);
-        --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+        --font-display: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, serif;
         --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Monaco, "Cascadia Mono", "Roboto Mono", monospace;
     }
@@ -34,8 +34,8 @@
         --paper: #0c0e0d;
         --card: #141715;
         --ink: #ebedea;
-        --muted: #9ba49f;
-        --faint: #6c756f;
+        --muted: #b0b9b3;
+        --faint: #828b85;
         --line: #232826;
         --line-strong: #333933;
         --amber: #f0b33e;
@@ -68,8 +68,8 @@
 
     body {
         font-family: var(--font-body);
-        font-size: 15px;
-        line-height: 1.6;
+        font-size: 16px;
+        line-height: 1.65;
         color: var(--ink);
         background: var(--paper);
         -webkit-font-smoothing: antialiased;
@@ -153,7 +153,7 @@
 
     .docket {
         font-family: var(--font-mono);
-        font-size: 11px;
+        font-size: 12px;
         letter-spacing: 0.08em;
         color: var(--faint);
         text-transform: uppercase;
@@ -200,14 +200,14 @@
     .stamp {
         display: inline-block;
         font-family: var(--font-mono);
-        font-size: 12px;
+        font-size: 13px;
         font-weight: 700;
         letter-spacing: 0.16em;
         text-transform: uppercase;
         color: var(--amber-ink);
         border: 2px solid currentColor;
         border-radius: 4px;
-        padding: 6px 12px 5px;
+        padding: 7px 14px 6px;
         background: var(--stamp-bg);
         transform: rotate(-2deg);
         animation: stamp-in 0.32s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
@@ -244,9 +244,20 @@
 
     .verdict-meta {
         font-family: var(--font-mono);
-        font-size: 12px;
+        font-size: 13px;
         color: var(--muted);
         letter-spacing: 0.02em;
+        overflow-wrap: anywhere;
+    }
+
+    .errcode {
+        font-family: var(--font-mono);
+        font-size: 12.5px;
+        color: var(--muted);
+        letter-spacing: 0.02em;
+        border: 1px dashed var(--line-strong);
+        border-radius: 6px;
+        padding: 4px 10px;
         overflow-wrap: anywhere;
     }
 
@@ -254,17 +265,17 @@
         font-family: var(--font-display);
         font-size: clamp(30px, 6vw, 46px);
         font-weight: 600;
-        line-height: 1.12;
+        line-height: 1.15;
         letter-spacing: -0.01em;
-        margin-bottom: 16px;
+        margin-bottom: 20px;
         max-width: 21em;
     }
 
     .verdict-details {
-        font-size: 16px;
+        font-size: 17px;
         color: var(--muted);
         max-width: 42em;
-        margin-bottom: 28px;
+        margin-bottom: 30px;
     }
 
     .verdict-hint {
@@ -283,16 +294,16 @@
         display: flex;
         flex-wrap: wrap;
         gap: 12px;
-        margin-bottom: 40px;
+        margin-bottom: 44px;
     }
 
     .btn {
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        padding: 11px 20px;
+        padding: 12px 22px;
         border-radius: 9px;
-        font-size: 14px;
+        font-size: 15px;
         font-weight: 600;
         text-decoration: none;
         cursor: pointer;
@@ -321,18 +332,18 @@
         border: 1px solid var(--line);
         border-radius: 12px;
         background: var(--card);
-        padding: 22px 24px 24px;
-        margin-bottom: 18px;
+        padding: 26px 28px 28px;
+        margin-bottom: 24px;
     }
 
     .panel-label {
         font-family: var(--font-mono);
-        font-size: 11px;
+        font-size: 12px;
         font-weight: 600;
         letter-spacing: 0.16em;
         text-transform: uppercase;
         color: var(--faint);
-        margin-bottom: 16px;
+        margin-bottom: 20px;
     }
 
     .steps {
@@ -346,7 +357,7 @@
         display: flex;
         gap: 14px;
         align-items: baseline;
-        font-size: 15px;
+        font-size: 16.5px;
     }
 
     .step-n {
@@ -356,109 +367,13 @@
         color: var(--amber-ink);
         border: 1px solid var(--line-strong);
         border-radius: 999px;
-        width: 24px;
-        height: 24px;
+        width: 26px;
+        height: 26px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
         transform: translateY(2px);
-    }
-
-    .ledger-head,
-    .req-row {
-        display: grid;
-        grid-template-columns: 1.2fr 1fr 30px;
-        gap: 16px;
-    }
-
-    .ledger-head {
-        font-family: var(--font-mono);
-        font-size: 11px;
-        font-weight: 600;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: var(--faint);
-        padding: 0 0 10px;
-        border-bottom: 1px solid var(--line-strong);
-    }
-
-    .req-row {
-        padding: 14px 0;
-        border-bottom: 1px solid var(--line);
-    }
-
-    .req-row:last-child {
-        border-bottom: none;
-        padding-bottom: 4px;
-    }
-
-    .req-text {
-        font-size: 14px;
-        overflow-wrap: anywhere;
-    }
-
-    .policy-tag {
-        font-family: var(--font-mono);
-        font-size: 11px;
-        color: var(--faint);
-        margin-top: 4px;
-        letter-spacing: 0.03em;
-        overflow-wrap: anywhere;
-    }
-
-    .cell-label {
-        display: none;
-        font-family: var(--font-mono);
-        font-size: 10px;
-        font-weight: 600;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: var(--faint);
-        margin-bottom: 4px;
-    }
-
-    .req-status {
-        display: flex;
-        align-items: flex-start;
-        justify-content: flex-end;
-        padding-top: 2px;
-    }
-
-    .req-status svg {
-        width: 17px;
-        height: 17px;
-        flex-shrink: 0;
-    }
-
-    .req-status .is-fail {
-        color: var(--red);
-    }
-
-    .req-status .is-ok {
-        color: var(--green);
-    }
-
-    .check-row {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 12px 16px;
-        border: 1px solid var(--line);
-        border-radius: 9px;
-        background: var(--paper);
-        font-size: 14px;
-    }
-
-    .check-row + .check-row {
-        margin-top: 10px;
-    }
-
-    .check-row svg {
-        width: 16px;
-        height: 16px;
-        color: var(--red);
-        flex-shrink: 0;
     }
 
     .creds {
@@ -472,12 +387,12 @@
         border: 1px solid var(--line);
         border-radius: 12px;
         background: var(--card);
-        padding: 20px;
+        padding: 24px;
     }
 
     .cred-title {
         font-family: var(--font-mono);
-        font-size: 11px;
+        font-size: 12px;
         font-weight: 600;
         letter-spacing: 0.16em;
         text-transform: uppercase;
@@ -503,14 +418,14 @@
 
     .cred-label {
         font-family: var(--font-mono);
-        font-size: 10px;
+        font-size: 11px;
         letter-spacing: 0.12em;
         text-transform: uppercase;
         color: var(--faint);
     }
 
     .cred-value {
-        font-size: 13.5px;
+        font-size: 14.5px;
         font-family: var(--font-mono);
         overflow-wrap: anywhere;
     }
@@ -520,7 +435,7 @@
         align-items: center;
         gap: 6px;
         font-family: var(--font-mono);
-        font-size: 11px;
+        font-size: 12px;
         font-weight: 600;
         letter-spacing: 0.04em;
         padding: 3px 10px 4px;
@@ -551,12 +466,12 @@
     .attempts-table {
         width: 100%;
         border-collapse: collapse;
-        font-size: 13.5px;
+        font-size: 14.5px;
     }
 
     .attempts-table th {
         font-family: var(--font-mono);
-        font-size: 10px;
+        font-size: 11px;
         font-weight: 600;
         letter-spacing: 0.14em;
         text-transform: uppercase;
@@ -578,7 +493,7 @@
     }
 
     .attempts-table td .pill {
-        font-size: 10px;
+        font-size: 11px;
     }
 
     .debug-toggle {
@@ -591,7 +506,7 @@
         border: none;
         cursor: pointer;
         font-family: var(--font-mono);
-        font-size: 11px;
+        font-size: 12px;
         font-weight: 600;
         letter-spacing: 0.16em;
         text-transform: uppercase;
@@ -648,7 +563,7 @@
         padding: 18px 0;
         color: var(--faint);
         font-family: var(--font-mono);
-        font-size: 11px;
+        font-size: 12px;
         letter-spacing: 0.12em;
         text-transform: uppercase;
     }
@@ -675,7 +590,7 @@
         gap: 12px;
         flex-wrap: wrap;
         font-family: var(--font-mono);
-        font-size: 11px;
+        font-size: 12px;
         letter-spacing: 0.06em;
         color: var(--faint);
     }
@@ -687,31 +602,6 @@
 
         .creds {
             grid-template-columns: 1fr;
-        }
-
-        .ledger-head {
-            display: none;
-        }
-
-        .req-row {
-            display: block;
-            position: relative;
-            padding-right: 32px;
-        }
-
-        .cell-label {
-            display: block;
-        }
-
-        .req-cell + .req-cell {
-            margin-top: 12px;
-        }
-
-        .req-status {
-            position: absolute;
-            top: 14px;
-            right: 0;
-            padding: 0;
         }
 
         .docket {
@@ -750,6 +640,7 @@
     <section class="verdict" aria-labelledby="verdict-heading">
         <div class="verdict-top">
             <span class="stamp stamp--checking" id="verdict-stamp" aria-hidden="true">Checking</span>
+            <span class="errcode" id="verdict-errcode" hidden></span>
             <span class="verdict-meta" id="verdict-meta"></span>
         </div>
         <h1 id="verdict-heading">Access denied</h1>
@@ -765,16 +656,6 @@
     <section class="panel" id="next-steps-section" aria-labelledby="next-steps-label" hidden>
         <h2 class="panel-label" id="next-steps-label">What to do next</h2>
         <ol class="steps" id="next-steps"></ol>
-    </section>
-
-    <section class="panel" id="requirements-section" aria-labelledby="requirements-label" hidden>
-        <h2 class="panel-label" id="requirements-label">What this app requires vs. what you have</h2>
-        <div id="requirements"></div>
-    </section>
-
-    <section class="panel" id="posture-section" aria-labelledby="posture-label" hidden>
-        <h2 class="panel-label" id="posture-label">Failing device checks</h2>
-        <div id="posture-fails"></div>
     </section>
 
     <section class="creds" aria-label="Your credentials">
@@ -914,9 +795,6 @@
         return String(value == null ? '' : value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     }
 
-    const svgCheck = '<svg class="is-ok" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>';
-    const svgCross = '<svg class="is-fail" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>';
-
     function nextStepsFor(data) {
         const type = data && data.reason ? data.reason.type : 'limited';
         switch (type) {
@@ -1011,8 +889,7 @@
                 slot.innerHTML = '<p class="verdict-hint">' + esc(data.hint) + '</p>';
             }
             document.getElementById('next-steps-section').hidden = true;
-            document.getElementById('requirements-section').hidden = true;
-            document.getElementById('posture-section').hidden = true;
+            document.getElementById('verdict-errcode').hidden = true;
             return;
         }
 
@@ -1022,13 +899,15 @@
         const errorText = typeof accessErrorText === 'function' ? accessErrorText(reason.errorCode) : null;
         setVerdictMeta(data.requestedUrl || originalUrl);
 
-        const heading = document.getElementById('verdict-heading');
-        heading.textContent = reason.headline || 'Access denied';
-        const chip = reason.errorCode
-            ? ' <span style="font-family:var(--font-mono);font-size:12px;font-weight:400;letter-spacing:0.02em;color:var(--faint);white-space:nowrap;">error ' + esc(String(reason.errorCode)) + (errorText ? ' — ' + esc(errorText) : '') + '</span>'
-            : '';
-        heading.insertAdjacentHTML('beforeend', chip);
+        const errcodeEl = document.getElementById('verdict-errcode');
+        if (reason.errorCode) {
+            errcodeEl.textContent = 'error ' + reason.errorCode + (errorText ? ' — ' + errorText : '');
+            errcodeEl.hidden = false;
+        } else {
+            errcodeEl.hidden = true;
+        }
 
+        document.getElementById('verdict-heading').textContent = reason.headline || 'Access denied';
         document.getElementById('verdict-details').textContent = reason.details || '';
         document.getElementById('verdict-hint-slot').innerHTML = '';
 
@@ -1037,36 +916,6 @@
             '<li><span class="step-n">' + (i + 1) + '</span><span>' + esc(s) + '</span></li>'
         ).join('');
         document.getElementById('next-steps-section').hidden = steps.length === 0;
-
-        if (Array.isArray(data.requirements) && data.requirements.length) {
-            const rows = data.requirements.map(r => `
-                <div class="req-row">
-                    <div class="req-cell">
-                        <span class="cell-label">Required</span>
-                        <div class="req-text">${esc(r.description)}</div>
-                        ${r.policyName ? `<div class="policy-tag">policy &ldquo;${esc(r.policyName)}&rdquo;${r.kind === 'require' ? ' &middot; extra requirement' : r.kind === 'exclude' ? ' &middot; exclusion rule' : ''}</div>` : ''}
-                    </div>
-                    <div class="req-cell">
-                        <span class="cell-label">You</span>
-                        <div class="req-text">${esc(r.userValue || '—')}</div>
-                    </div>
-                    <div class="req-status">${r.satisfied === true ? svgCheck : svgCross}</div>
-                </div>`).join('');
-            document.getElementById('requirements').innerHTML =
-                '<div class="ledger-head"><span>Required</span><span>You</span><span></span></div>' + rows;
-            document.getElementById('requirements-section').hidden = false;
-        } else {
-            document.getElementById('requirements-section').hidden = true;
-        }
-
-        if (Array.isArray(data.failingPostureChecks) && data.failingPostureChecks.length) {
-            document.getElementById('posture-fails').innerHTML = data.failingPostureChecks.map(c =>
-                '<div class="check-row">' + svgCross + '<span>' + esc(c.name) + '</span></div>'
-            ).join('');
-            document.getElementById('posture-section').hidden = false;
-        } else {
-            document.getElementById('posture-section').hidden = true;
-        }
     }
 
     function denyErrorData(error) {
@@ -1166,6 +1015,7 @@
             return;
         }
         document.getElementById('device-content').innerHTML =
+            credRow('Device ID', data.deviceId || '—') +
             credRow('Device', data.deviceName || '—') +
             credRow('Model', data.deviceModel || '—') +
             credRow('OS version', data.deviceOsVersion || '—') +
@@ -1177,9 +1027,15 @@
             credError('posture-content');
             return;
         }
-        document.getElementById('posture-content').innerHTML =
-            credPill('CrowdStrike', 'Running', 'Not detected', data.crowdstrikeEnabled, false) +
-            credPill('OS updates', 'Up to date', 'Update required', data.osUpToDate, true);
+        const checks = Array.isArray(data.checks) ? data.checks : [];
+        const target = document.getElementById('posture-content');
+        if (!checks.length) {
+            target.innerHTML = credRow('Status', 'No posture data reported');
+            return;
+        }
+        target.innerHTML = checks.map(c =>
+            credPill(c.name, 'Passed', 'Failed', c.success === true, false)
+        ).join('');
     }
 
     function syntaxHighlightJSON(obj) {

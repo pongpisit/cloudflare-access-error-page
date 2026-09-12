@@ -86,14 +86,13 @@ Page renders the deny reason, details, and next steps
   "app": { "name": "...", "domain": "...", "id": "..." },
   "requestedUrl": "https://intranet.example.com",
   "user": { "email": "...", "name": "...", "groups": ["..."], "country": "TH" },
-  "requirements": [ { "policyName": "...", "description": "...", "satisfied": false, "kind": "include", "userValue": "Your groups: ..." } ],
   "failingPostureChecks": [ { "name": "...", "type": "..." } ],
   "failedLogins": [ { "datetime": "...", "applicationName": "...", "identityProvider": "...", "country": "..." } ],
   "capabilities": { "policyEvaluation": true, "loginHistory": true, "devicePosture": true }
 }
 ```
 
-Evaluation is best-effort: Cloudflare does not expose which specific policy failed, so the worker derives it from the app's policies and the user's identity. Rules that cannot be evaluated locally (MFA, external evaluation, service tokens) are surfaced as unmet additional requirements rather than silently ignored.
+Evaluation is best-effort: Cloudflare does not expose which specific policy failed, so the worker derives the reason category from the app's policies and the user's identity. **Policy internals (names, rules, requirement text) are never included in the response** — the client only receives the reason category, the user's own identity, device, and posture status. The Posture card renders every check returned by the device posture API, and the user-facing copy for each reason type avoids naming policies or quoting their rules.
 
 ## Worker Implementation
 
