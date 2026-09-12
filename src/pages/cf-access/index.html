@@ -1071,10 +1071,15 @@
 
     function denyErrorData(error) {
         if (error && (error.status === 401 || error.code === 'missing_access_jwt')) {
+            const host = (window.location && window.location.host) || 'this hostname';
+            const onWorkersDev = /\.workers\.dev$/i.test(String(host));
+            const hint = onWorkersDev
+                ? 'Your identity could not be verified because this page is served on a *.workers.dev URL, which cannot be placed behind Cloudflare Access. Bind the Worker to your Access-protected custom domain and point the Access block-page redirects there.'
+                : 'Your identity could not be verified because requests to ' + host + ' are not passing through Cloudflare Access. Create a self-hosted Access application for ' + host + ' and leave its path empty — the app must cover this page and its /cf-access/api/* calls (a path-scoped app such as /cf-access only protects that one path). Also set the Zero Trust cookie domain to your parent domain so a user blocked from another app arrives here already signed in.';
             return {
                 error: 'No Cloudflare Access session on this page',
                 stamp: 'No session',
-                hint: 'Your identity could not be verified because this page is not being served behind Cloudflare Access. The deny reason only works when the page is deployed on a domain protected by Access in the same Zero Trust organization as the application you were blocked from (for example https://access.example.com/cf-access/). If you are seeing this on a *.workers.dev URL, that is the cause — bind the Worker to your Access-protected domain and point the Access block-page redirects there.'
+                hint: hint
             };
         }
         if (error && (error.status === 500 || error.code === 'identity_unavailable')) {

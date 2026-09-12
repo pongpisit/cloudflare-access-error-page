@@ -72,9 +72,10 @@ The committed `wrangler.jsonc` works out of the box: the Worker is served on you
 > ⚠️ **Important — the `*.workers.dev` URL cannot show deny reasons.** The page resolves your identity and the denying policy through Cloudflare Access (`Cf-Access-Jwt-Assertion` header and `/cdn-cgi/access/get-identity`), which only exist on Access-protected custom domains. On `workers.dev` the page renders but shows "No Cloudflare Access session on this page". For the page to work:
 >
 > 1. **Bind the Worker to a custom domain** — add a route (e.g. `access.example.com/cf-access*`) in `wrangler.jsonc` or the dashboard
-> 2. **Protect that domain with an Access application** — create a self-hosted Access app for the page's hostname (it can simply Allow `Everyone`; it exists so the page inherits an Access session)
+> 2. **Protect that domain with an Access application** — create a self-hosted Access app for the page's hostname and **leave the path empty** (it can simply Allow `Everyone`): the app must cover the page *and* its `/cf-access/api/*` and `/cf-access/scripts/*` paths. A path-scoped app (e.g. `/cf-access`) only protects that one path — the API calls will bypass Access and the page will show *No Cloudflare Access session on this page*
 > 3. **Use the same cookie domain** as the applications that redirect to it (e.g. cookie domain `.example.com`), so a user blocked from `app.example.com` arrives at `access.example.com/cf-access/` already signed in
 > 4. Then set the block-page redirects (step 3 below) to the custom-domain page URL
+> 5. **Verify before testing**: `curl -sI https://<page-host>/cf-access/api/denyreason` should return a 302 redirect to `*.cloudflareaccess.com` — a 401 means no Access application covers the API path
 
 ### 2. Create the API token and secret
 
