@@ -1,137 +1,133 @@
-# Cloudflare Zero Trust — DNS Filtering & Custom Pages
+# Cloudflare One — Access Custom Error Page
 
-DNS filtering visibility and custom pages for Cloudflare Zero Trust, deployed as a single Cloudflare Worker.
+A dynamic **"Access Denied"** page for Cloudflare Zero Trust, deployed as a single Cloudflare Worker. When Cloudflare Access blocks a user, this page tells them **exactly why** — which policy, group, country, or device posture requirement they failed — in plain language, and gives them actionable next steps.
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/pongpisit/cloudflare-custom-pages)
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/pongpisit/cloudflare-access-error-page)
+
+## How it works
+
+```
+User → Access-protected application
+  ↓ blocked by an Access policy
+Cloudflare Access redirects to this page with ?original_url=<blocked app>
+  ↓
+Worker page (/cf-access/) → fetches /cf-access/api/denyreason?original_url=...
+  ↓
+Worker resolves the reason:
+  1. Matches the Access application for original_url
+  2. Fetches its policies (Allow / Block) and Access groups
+  3. Evaluates include / exclude / require rules against the
+     user's email, groups, country and IP
+  4. Correlates failing device posture checks
+  5. Fetches the user's failed Access sign-ins (last 15 minutes)
+  ↓
+User sees a plain-language reason, what to do next, and their details
+```
+
+## What the blocked user sees
+
+**"Why you were denied" card** — the exact reason, one of:
+
+| Reason type | Meaning |
+|-------------|---------|
+| `blocked_by_deny_policy` | A Block (Deny) policy matched your account or network — the policy name and trigger are shown |
+| `no_allow_policy_matched` | You authenticated, but no Allow policy includes your account — each policy's requirements are compared against your identity |
+| `requirement_not_met` | Your account is allowed, but an extra requirement (MFA, client certificate) was not satisfied |
+| `posture_check_failed` | Your device failed required posture checks (CrowdStrike, OS updates, disk encryption) |
+| `session_issue` | You meet the requirements, but your session was rejected or expired |
+| `limited` | Detailed reason unavailable — the API token is missing permissions; the page still shows everything else |
+
+- **Requirements breakdown** — e.g. *Policy "Engineering-only" requires members of Access group "Engineering" — your groups: Sales, Marketing*
+- **Failing posture checks** — listed with fix hints
+- **Recent failed sign-ins** — the user's failed Access login events from the last 15 minutes (application, identity provider, country, reason)
+- **What to do next** — actionable steps, plus **Contact IT** / **Copy details** buttons prefilled with the full context (reason, error code, application, email, failing checks)
+- **Your details** — identity (name, email, groups, WARP status), device, posture, and raw debug JSON
+- Light/dark themes, keyboard accessible (WCAG 2.1 AA patterns)
+
+Everything degrades gracefully: with no API token (or missing permissions) the page still works, showing identity and posture data with generic guidance.
 
 ## Prerequisites
 
-- **Cloudflare Account** with Zero Trust enabled
-- **API Tokens** (see [Configuration](#configuration) below)
-- **Node.js 18+** (for local development only)
+- Cloudflare account with **Zero Trust (Cloudflare One)** enabled
+- A hostname to serve this page on, itself behind Cloudflare Access with cookie domain `.example.com` (wildcard, so the session carries over)
+- Node.js 18+ (local development only)
 
-For Cloudflare Workers setup, see the [Workers Documentation](https://developers.cloudflare.com/workers/get-started/guide/).
+## Setup
 
----
+### 1. Deploy the Worker
 
-## DNS Filtering
+```bash
+npm install
+cp wrangler.example.jsonc wrangler.jsonc   # edit the route pattern for your domain
+npm run deploy
+```
 
-### DNS Analytics Dashboard (`/cf-dns-dashboard/`)
+### 2. Create the API token and secret
 
-Real-time DNS filtering analytics powered by Cloudflare's GraphQL API. Monitor, investigate, and report on all Gateway DNS activity from a single dashboard.
+Create an API token (Cloudflare dashboard → My Profile → API Tokens) with:
 
-**Highlights:**
-- **Live DNS Logs** — streaming query log with 10-second auto-refresh
-- **DNS Query Timeline** — query volume over selectable windows (Live, 1h, 24h, 7d, 30d)
-- **Top 20 Allowed / Blocked Categories** — category-level breakdown
-- **Top 20 Queried Domains** — most-queried domain names
-- **Top 20 Blocked Domains** — blocked domain analysis
-- **Newly Observed Domains** — first-seen domain detection
-- **Geography Analysis** — query distribution by country
-- **Action Breakdown** — allowed vs blocked pie chart
-- **Application Analysis** — traffic by application type
-- **PDF Export** — one-click report generation via html2canvas + jsPDF
+| Permission | Used for |
+|------------|----------|
+| Account → Access: Apps and Policies → Read | Resolve the application and evaluate its policies |
+| Account → Access: Audit Logs → Read | Recent failed sign-ins (GraphQL) |
+| Account → Zero Trust: Devices → Read | Device details |
+| Account → Zero Trust: Device Posture → Read | Device posture checks |
+| Zone → Zone → Read + Zone → Access: Apps and Policies → Read | Only if your Access apps are zone-scoped |
 
-![DNS Analytics Dashboard](src/img/dns-dashboard.png)
+Then set it as a Worker secret:
 
-### Gateway Block Page (`/cf-gateway/`)
+```bash
+wrangler secret put BEARER_TOKEN
+```
 
-Custom block page displayed by Cloudflare Secure Web Gateway when a DNS or HTTP policy blocks a request. Parses Gateway query parameters to show the blocked URL, matched categories, and policy details. Supports light/dark themes.
+### 3. Point your Access applications at the page
 
-![Gateway Block Page](src/img/gw-block-page.png)
+In each Access application (Zero Trust → Applications → your app):
 
----
+1. Under **Additional settings**, find the block page options.
+2. Set **Identity failure block page** → **Custom Redirect URL** → `https://your-domain.com/cf-access/`
+3. Set **Non-identity failure block page** → **Custom Redirect URL** → `https://your-domain.com/cf-access/`
 
-## Custom Pages
+Access appends the `original_url` parameter to the redirect — the page uses it to resolve the application and its policies. Both settings matter:
 
-### Access Info Page (`/cf-access/`)
+- **Identity failure page** — shown after login when an identity rule (email, user group) blocks the user
+- **Non-identity failure page** — shown before login when a non-identity rule (country, IP, device posture) blocks the user
 
-Dynamic "Access Denied" page that tells each user **why** Cloudflare Access blocked them, in addition to showing their identity and device information.
+> The *Custom Redirect URL* option works on **all** Zero Trust plans. (The inline *Custom Page Template* is Pay-as-you-go/Enterprise only, and is not used here.)
 
-**Deny reason enrichment:**
+### 4. Optional customization
 
-- **"Why you were denied" card** — resolves the Access application from the redirect's `original_url` parameter, fetches its policies, and evaluates them against the user's identity:
-  - `blocked_by_deny_policy` — a Block (Deny) policy matched your account/network (names the policy and its trigger)
-  - `no_allow_policy_matched` — no Allow policy includes you (shows each policy's requirements vs. your email, groups, country, and IP)
-  - `requirement_not_met` — your account is allowed, but an additional requirement (MFA, client certificate) was not satisfied
-  - `posture_check_failed` — your device failed required posture checks (CrowdStrike, OS updates, disk encryption)
-  - `session_issue` — requirements met, but the session was rejected or expired
-- **Recent failed sign-ins** — the user's failed Access login events from the last 15 minutes (application, identity provider, country, reason)
-- **"What to do next"** — actionable next steps, plus **Contact IT** / **Copy details** buttons prefilled with the full context (reason, error code, application, email, failing checks)
-- **Graceful degradation** — without an API token (or missing permissions) the page still shows identity, device, and posture data with generic guidance
+- Set `IT_SUPPORT_EMAIL` in `src/pages/cf-access/index.html` so the **Contact IT** button is prefilled with your support address
+- Branding, logo, and copy can be edited in the same file
 
-**Also displays:** WARP connection status, device details, device posture checks, and raw debug JSON.
+## How the reason is determined
 
-![Access Info Page](src/img/access-block-page.png)
+Cloudflare does not expose which specific policy failed. This page derives it:
 
-### User Coaching Page (`/coaching/`)
+1. `original_url` from the Access redirect identifies the application
+2. The application's policies are fetched from the Cloudflare API
+3. `include` / `exclude` / `require` rules are evaluated locally against the user's identity, groups, country (`request.cf.country`) and IP (`CF-Connecting-IP`)
+4. Failing device posture checks and recent failed sign-ins are correlated
 
-Placeholder for security awareness coaching — will be served when Gateway policies use the "coach" action instead of a hard block.
+Rules that cannot be evaluated locally (MFA, service tokens, external evaluation) are surfaced as unmet additional requirements instead of silently ignored.
 
----
-
-## Configuration
-
-### Required Secrets
-
-Set these using `wrangler secret put <SECRET_NAME>`:
-
-| Secret | Required For | Permissions |
-|--------|--------------|-------------|
-| `DNS_DASHBOARD_API_TOKEN` | DNS Dashboard | Account → Zero Trust → Read |
-| `DNS_DASHBOARD_ACCOUNT_ID` | DNS Dashboard | Your Cloudflare Account ID |
-| `BEARER_TOKEN` | Access Info Page | Zero Trust → Devices → Read, Device Posture → Read. For full deny reasons also add: Access → Apps & Policies → Read, Access → Audit Logs → Read |
-
-### DNS Dashboard Setup
-
-1. Create API token with **Account → Zero Trust → Read** permission
-2. Set secrets:
-   ```bash
-   wrangler secret put DNS_DASHBOARD_API_TOKEN
-   wrangler secret put DNS_DASHBOARD_ACCOUNT_ID
-   ```
-
-### Gateway Block Page Setup
-
-1. Navigate to **Zero Trust** → **Gateway** → **Firewall Policies**
-2. Edit your block policy
-3. Set **Block page** to: `https://your-domain.com/cf-gateway/`
-
-### Access Info Page Setup
-
-1. Configure Cloudflare Access for your domain
-2. Set cookie domain to `.example.com` (wildcard for SSO)
-3. Configure `BEARER_TOKEN` secret for device/posture data
-4. For full deny reasons, add these permissions to the `BEARER_TOKEN`:
-   - **Access → Apps & Policies → Read** — per-policy evaluation
-   - **Access → Audit Logs → Read** — failed sign-in history
-   - **Zone → Access: Apps and Policies → Read** and **Zone → Zone → Read** — only needed if your Access apps are zone-scoped
-5. In each Access application, set both the **Identity failure block page** and the **Non-identity failure block page** to *Custom Redirect URL* pointing at `https://your-domain.com/cf-access/` — Access appends the `original_url` parameter that the page uses to resolve the application and its policies
-6. Optional: set the `IT_SUPPORT_EMAIL` constant in `src/pages/cf-access/index.html` to your support address so the Contact IT button is prefilled
-
-## Project Structure
+## Project structure
 
 ```
-cloudflare-custom-pages/
+cloudflare-access-error-page/
 ├── src/
-│   ├── pages/
-│   │   ├── cf-dns-dashboard/       # DNS analytics dashboard
-│   │   │   ├── index.html
-│   │   │   └── categoryList.js
-│   │   ├── cf-gateway/block.html   # Gateway block page
-│   │   ├── cf-access/             # Access denied/info page
-│   │   │   ├── index.html
-│   │   │   └── scripts/
-│   │   │       ├── warpinfo.js
-│   │   │       ├── deviceinfo.js
-│   │   │       ├── postureinfo.js
-│   │   │       └── denyreason.js
-│   │   └── coaching/index.html     # User coaching page
-│   ├── worker-template.js
-│   └── build.js
+│   ├── pages/cf-access/           # The Access error page
+│   │   ├── index.html             # Page UI (reason card, tiles, failed sign-ins)
+│   │   └── scripts/               # Client-side data fetchers
+│   │       ├── warpinfo.js
+│   │       ├── deviceinfo.js
+│   │       ├── postureinfo.js
+│   │       └── denyreason.js
+│   ├── worker-template.js         # Worker source (routes + /cf-access/api/*)
+│   └── build.js                   # Bundles pages into main.js
 ├── main.js (auto-generated)
 ├── wrangler.example.jsonc
-└── ARCHITECTURE.md
+└── ARCHITECTURE.md                # Full technical documentation
 ```
 
 ## Development
@@ -139,7 +135,7 @@ cloudflare-custom-pages/
 ```bash
 npm install
 cp wrangler.example.jsonc wrangler.jsonc
-# Edit wrangler.jsonc with your routes
+# Edit wrangler.jsonc with your route
 
 npm run build    # Build worker
 npm run dev      # Local development
@@ -148,6 +144,7 @@ npm run deploy   # Deploy to Cloudflare
 
 ## Documentation
 
-- [ARCHITECTURE.md](./ARCHITECTURE.md) — Technical architecture details
+- [ARCHITECTURE.md](./ARCHITECTURE.md) — Technical architecture, API endpoints, and evaluation flow
+- [Cloudflare Access custom block pages](https://developers.cloudflare.com/cloudflare-one/reusable-components/custom-pages/access-block-page/)
+- [Access login events via GraphQL](https://developers.cloudflare.com/analytics/graphql-api/tutorials/querying-access-login-events/)
 - [Cloudflare Workers Docs](https://developers.cloudflare.com/workers/)
-- [Zero Trust Docs](https://developers.cloudflare.com/cloudflare-one/)

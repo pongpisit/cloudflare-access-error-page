@@ -1,7 +1,7 @@
 {
-  "name": "cloudflare-custom-pages",
+  "name": "cloudflare-access-error-page",
   "version": "1.0.0",
-  "description": "Cloudflare custom pages for SWG and user coaching",
+  "description": "Cloudflare One (Zero Trust) Access custom error page that tells each user why they were denied",
   "main": "main.js",
   "engines": {
     "node": ">=18.0.0"
@@ -14,10 +14,12 @@
   },
   "keywords": [
     "cloudflare",
+    "cloudflare-one",
+    "zero-trust",
+    "access",
     "workers",
-    "swg",
     "block-page",
-    "coaching"
+    "error-page"
   ],
   "author": "Zero Security Corp",
   "license": "PROPRIETARY",

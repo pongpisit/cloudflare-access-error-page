@@ -1,35 +1,23 @@
 {
   // Cloudflare Worker Configuration
-  "name": "cloudflare-custom-pages",
+  "name": "cloudflare-access-error-page",
   "main": "main.js",
   "compatibility_date": "2024-01-01",
-  
+
   // Your Cloudflare Account ID (set via CLI: wrangler deploy --account-id=YOUR_ID)
   // "account_id": "your-account-id-here",
-  
-  // Route configuration
+
+  // Route configuration — the pattern must cover the page and its /api/* and /scripts/* paths
   "routes": [
-    {
-      "pattern": "access.example.com/cf-gateway*",
-      "zone_name": "example.com"
-    },
     {
       "pattern": "access.example.com/cf-access*",
       "zone_name": "example.com"
-    },
-    {
-      "pattern": "dash.0security.net/dns*",
-      "zone_name": "0security.net"
     }
   ],
-  
+
   // Environment variables (use wrangler secret put for sensitive values)
-  // For cf-access page:
-  //   - BEARER_TOKEN: API token with Zero Trust read permissions
-  // For cf-dns-dashboard page:
-  //   - DNS_DASHBOARD_API_TOKEN: API token with Zero Trust read permissions
-  //   - DNS_DASHBOARD_ACCOUNT_ID: Your Cloudflare account ID
-  "vars": {
-    // "DNS_DASHBOARD_ACCOUNT_ID": "your-account-id-here"
-  }
+  // For the Access error page:
+  //   - BEARER_TOKEN: API token with Access: Apps & Policies Read, Access: Audit Logs Read,
+  //     Zero Trust Devices Read, and Device Posture Read permissions
+  "vars": {}
 }
