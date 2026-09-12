@@ -2,20 +2,14 @@
 
 ## Overview
 
-This project is a Cloudflare Worker that serves multiple custom pages for Zero Trust. All pages are bundled into a single worker (`main.js`) via the build script.
+This project is a Cloudflare Worker that serves the **Cloudflare One Access custom error page** (`/cf-access/`). All page assets are bundled into a single worker (`main.js`) by the build script.
 
 ## Components
 
-### Gateway Block Page (`/cf-gateway/`)
-Static HTML page served when Cloudflare Gateway blocks a request. Cloudflare SWG appends query parameters (`cf_site_uri`, `cf_policy_name`, `cf_request_category_names`, etc.) which the page parses and displays to the user.
+### Access Error Page (`/cf-access/`)
+Dynamic page shown to users blocked by a Cloudflare Access policy. It explains **why the user was denied**, shows their identity and device details, and gives actionable next steps. Uses the Cloudflare Access JWT for authentication and fetches identity, device, posture, and Access policy data via Cloudflare APIs.
 
-### Access Info Page (`/cf-access/`)
-Dynamic page that displays authenticated user information and explains **why the user was denied**. Uses Cloudflare Access JWT for authentication and fetches device/posture data plus Access application policies via the Cloudflare API.
-
-### DNS Analytics Dashboard (`/cf-dns-dashboard/`)
-Real-time DNS analytics dashboard. Fetches data from Cloudflare's GraphQL Analytics API (`gatewayResolverQueriesAdaptiveGroups`) and renders charts using Chart.js. Supports Live mode with 10-second auto-refresh.
-
-## Authentication Flow (cf-access)
+## Authentication Flow
 
 ### Initial Authentication
 ```
@@ -29,17 +23,17 @@ User authenticates → Cloudflare sets cookies:
 Redirect to original resource with valid session
 ```
 
-### Accessing cf-access Page
+### Accessing the Error Page
 ```
-User → access.example.com/cf-access
+User blocked by Access policy → redirected to /cf-access/?original_url=<blocked app>
   ↓
 Browser sends CF_Authorization cookie (wildcard domain)
   ↓
 Cloudflare adds Cf-Access-Jwt-Assertion header
   ↓
-Worker serves page → JavaScript fetches data
+Worker serves page → JavaScript fetches /cf-access/api/denyreason
   ↓
-No re-authentication needed ✓
+Page renders the deny reason, details, and next steps
 ```
 
 ## Key Components
@@ -60,10 +54,13 @@ No re-authentication needed ✓
 
 ### API Endpoints
 
+#### `/cf-access/api/identity` (Worker API)
+- Returns identity data from `/cdn-cgi/access/get-identity`
+
 #### `/cf-access/api/userdetails` (Worker API)
-- Combines identity, device details, and posture data
+- Combines identity, device details, and posture data into a single response
 - Validates `Cf-Access-Jwt-Assertion` header
-- Fetches from `/cdn-cgi/access/get-identity` and Cloudflare API
+- If `BEARER_TOKEN` is configured, fetches device and posture data from the Cloudflare API
 
 #### `/cf-access/api/denyreason` (Worker API)
 - Explains why the user was denied by evaluating Access application policies against the user's identity
@@ -96,32 +93,26 @@ No re-authentication needed ✓
 
 Evaluation is best-effort: Cloudflare does not expose which specific policy failed, so the worker derives it from the app's policies and the user's identity. Rules that cannot be evaluated locally (MFA, external evaluation, service tokens) are surfaced as unmet additional requirements rather than silently ignored.
 
-#### `/dns/api/*` (DNS Dashboard APIs)
-- `monthly-stats` - Total queries, allowed/blocked counts
-- `30day` - Query trends over time
-- `top-allowed`, `top-blocked` - Category breakdowns
-- `top-queries`, `blocked-domains` - Domain analysis
-- `live-logs` - Real-time DNS query logs
-- `geography`, `geography-blocked` - Country distribution
-
 ## Worker Implementation
 
 ### Route Handling
 ```javascript
-if (path === '/cf-access/api/userdetails') {
-  return handleUserDetails(request, env);
+if (path === '/cf-access/' || path === '/cf-access') {
+  return serveAccessPage(url);
 } else if (path === '/cf-access/api/denyreason') {
   return handleDenyReason(request, env);
-} else if (path.startsWith('/dns/api/')) {
-  return handleDNSAPI(request, env);
+} else if (path === '/cf-access/api/userdetails') {
+  return handleUserDetails(request, env);
 }
 ```
+
+The `/` path redirects to `/cf-access/`; anything else returns 404.
 
 ### Key Functions
 
 **handleDenyReason(request, env)**
 
-Explains why the user was denied: resolves the Access app from `original_url`, evaluates its policies against the user's identity/groups/country/IP, correlates failing device posture checks, and fetches recent failed sign-in events. Returns a structured reason (see `/cf-access/api/denyreason` above).
+Explains why the user was denied: resolves the Access app from `original_url`, evaluates its policies against the user's identity/groups/country/IP, correlates failing device posture checks, and fetches recent failed sign-in events.
 
 **handleUserDetails(request, env)**
 
@@ -135,95 +126,51 @@ Combines identity, device, and posture data into a single API response.
 5. If `BEARER_TOKEN` is configured, fetches device and posture data from Cloudflare API
 6. Returns combined JSON response
 
-**Required Variables:**
-| Variable | Source | Description |
-|----------|--------|-------------|
-| `jwtAssertion` | `Cf-Access-Jwt-Assertion` header | JWT token added by Cloudflare Access |
-| `device_id` | JWT payload or identity data | Unique device identifier |
-| `account_id` | Identity response | Cloudflare account ID |
-| `BEARER_TOKEN` | Worker secret (env) | API token for Cloudflare API calls |
+**Deny reason helpers**
 
-**API Calls Made:**
+| Function | Purpose |
+|----------|---------|
+| `normalizeUserGroups` | Normalizes group objects from the identity response |
+| `buildEvalContext` | Builds the evaluation context (email, groups, country, IP) |
+| `matchRule` | Matches a single policy rule against the user; returns true/false/null (null = cannot evaluate) |
+| `describeRule` | Human-readable description of a policy rule |
+| `userValueForRule` | "Your email/groups/country/IP" text shown next to each requirement |
+| `evaluateAccessPolicies` | Evaluates all policies; returns matched Deny/Allow policy, requirement candidates, and requirement rows |
+| `cfApiGetAll` | Paginated Cloudflare API GET helper |
+| `findAccessApp` | Resolves the Access app for `original_url` (account apps, then zone apps) |
+| `fetchAppPolicies` / `fetchAccessGroupsMap` | Policy and group lookups (account or zone scoped) |
+| `fetchFailedAccessLogins` | GraphQL query for failed login events |
+| `buildLimitedReasonDetails` | Fallback guidance when data is unavailable |
 
-1. **Identity API** (always called)
-   ```
-   GET /cdn-cgi/access/get-identity
-   Headers: Cookie (CF_Authorization forwarded)
-   Returns: User email, name, groups, device sessions, account_id
-   ```
-
-2. **Device Details API** (requires BEARER_TOKEN)
-   ```
-   GET https://api.cloudflare.com/client/v4/accounts/{account_id}/devices/{device_id}
-   Headers: Authorization: Bearer {BEARER_TOKEN}
-   Returns: Device name, model, OS version, serial number, manufacturer
-   ```
-
-3. **Device Posture API** (requires BEARER_TOKEN)
-   ```
-   GET https://api.cloudflare.com/client/v4/accounts/{account_id}/devices/{device_id}/posture/check
-   Headers: Authorization: Bearer {BEARER_TOKEN}
-   Returns: Posture check results (Crowdstrike, OS version, disk encryption, etc.)
-   ```
-
-**Response Structure:**
-```json
-{
-  "identity": { "email": "...", "name": "...", "groups": [...], "account_id": "..." },
-  "device": { "name": "...", "model": "...", "os_version": "...", "serial_number": "..." },
-  "posture": { "result": [...] }
-}
-```
-
-**handleLiveLogs(request, env)**
-- Queries GraphQL for recent DNS logs
-- Groups by queryName, categoryIds, resolverDecision, datetimeMinute
-- Returns aggregated log entries
-
-### Why Use Worker Proxy?
+### Why Use a Worker Proxy?
 
 1. **Cookie forwarding** - Browser cookies need explicit forwarding
-2. **API aggregation** - Combines multiple API calls
-3. **Token security** - Keeps Bearer/API tokens server-side
+2. **API aggregation** - Combines multiple API calls into one endpoint
+3. **Token security** - Keeps the Bearer/API token server-side
 4. **Error handling** - Centralized error management
 
-## Codex Frontend Alignment
+## Build
 
-This project is a vanilla HTML/CSS/JS Worker (not React/Kumo), so React-specific Codex mandates do not apply. However, the following Codex frontend architecture principles have been adopted:
+`src/build.js` reads `src/pages/cf-access/index.html` and its scripts, escapes them for template literals, and injects them into `src/worker-template.js` placeholders to produce `main.js`:
 
-### Semantic HTML
-- All pages use proper landmarks: `<header>`, `<nav>`, `<main>`, `<section>`, `<aside>`, `<footer>`
-- Skip-to-content links on every page for keyboard navigation
-- Tables use `<thead>`, `<tbody>`, and `scope="col"` on headers
+| Placeholder | Content |
+|-------------|---------|
+| `__ACCESS_PAGE_HTML__` | The error page HTML |
+| `__WARPINFO_JS__`, `__DEVICEINFO_JS__`, `__POSTUREINFO_JS__`, `__DENYREASON_JS__` | Client-side scripts served under `/cf-access/scripts/` |
 
-### Accessibility (WCAG 2.1 AA)
-- **Focus states**: All interactive elements have `focus-visible` outlines using `var(--accent-primary)`
-- **ARIA attributes**: `aria-label` on buttons/links, `aria-pressed` on toggle buttons, `aria-expanded`/`aria-controls` on collapsibles, `role="dialog"` and `aria-modal` on modals
-- **Keyboard navigation**: Modal focus trap (Tab/Shift+Tab cycles within modal), Escape key closes modals, focus returns to trigger element on close
-- **Screen reader support**: `aria-live="polite"` for live status updates, `role="status"` on loading indicators, `aria-hidden="true"` on decorative SVGs and spacers, `role="alert"` on error banners
+## Frontend Conventions
 
-### Explicit State Handling
-- **Loading**: Spinner indicators with `role="status"` and descriptive `aria-label`
-- **Error**: User-friendly error messages (never raw error codes/messages); error banner with retry button on the DNS dashboard
-- **Empty**: "No queries found" and "Waiting for DNS queries..." messages for empty states
+This project is a vanilla HTML/CSS/JS Worker (not React), so React-specific mandates do not apply. The page follows these principles:
 
-### Styling
-- Inline styles migrated to named CSS classes (`.nav-brand`, `.nav-title`, `.sidebar`, `.main-content`, `.chart-grid-2`, `.section-group-purple`, etc.)
-- CSS custom properties (design tokens) used consistently across all pages
-- Responsive breakpoints via `@media` queries
-
-### Navigation
-- Semantic `<a href>` for navigation links, `<button>` for actions/mutations
-- Collapsible sections use proper `<button>` elements (not clickable `<h2>` or `<div>`)
-
-### Anti-Patterns Avoided
-- No raw `error.message` or API error codes shown to users
-- No `undefined`-as-loading pattern — explicit loading states everywhere
-- No CSS-in-JS — all styles in `<style>` blocks or Tailwind utilities
+- **Semantic HTML** - proper landmarks (`<header>`, `<nav>`, `<main>`, `<footer>`), skip-to-content link, `scope` on table headers
+- **Accessibility (WCAG 2.1 AA)** - `focus-visible` outlines, `aria-label`/`aria-expanded`/`aria-controls`, `role="status"` on loading spinners, `aria-hidden` on decorative SVGs
+- **Explicit state handling** - loading spinners, user-friendly error states, hidden-when-empty sections
+- **Design tokens** - CSS custom properties for theming with light/dark support
+- **Escaping** - all server-provided strings are HTML-escaped via `esc()` before rendering
 
 ## References
 
 - [Cloudflare Access Documentation](https://developers.cloudflare.com/cloudflare-one/identity/authorization-cookie/)
+- [Access custom block pages](https://developers.cloudflare.com/cloudflare-one/reusable-components/custom-pages/access-block-page/)
+- [Access login events via GraphQL](https://developers.cloudflare.com/analytics/graphql-api/tutorials/querying-access-login-events/)
 - [Workers Documentation](https://developers.cloudflare.com/workers/)
-- [GraphQL Analytics API](https://developers.cloudflare.com/analytics/graphql-api/)
-- [Cloudflare Codex Frontend Guidelines](https://codex.cloudflare.dev/engineering/codex/frontend/)
