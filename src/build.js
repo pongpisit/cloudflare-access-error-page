@@ -14,6 +14,7 @@ const dnsDashboardHTML = fs.readFileSync(path.join(__dirname, 'pages/cf-dns-dash
 const warpInfoJS = fs.readFileSync(path.join(__dirname, 'pages/cf-access/scripts/warpinfo.js'), 'utf-8');
 const deviceInfoJS = fs.readFileSync(path.join(__dirname, 'pages/cf-access/scripts/deviceinfo.js'), 'utf-8');
 const postureInfoJS = fs.readFileSync(path.join(__dirname, 'pages/cf-access/scripts/postureinfo.js'), 'utf-8');
+const denyReasonJS = fs.readFileSync(path.join(__dirname, 'pages/cf-access/scripts/denyreason.js'), 'utf-8');
 const categoryListJS = fs.readFileSync(path.join(__dirname, 'pages/cf-dns-dashboard/categoryList.js'), 'utf-8');
 
 // Read worker template
@@ -38,6 +39,7 @@ let workerContent = workerTemplate
   .replace('__WARPINFO_JS__', escapeForTemplate(warpInfoJS))
   .replace('__DEVICEINFO_JS__', escapeForTemplate(deviceInfoJS))
   .replace('__POSTUREINFO_JS__', escapeForTemplate(postureInfoJS))
+  .replace('__DENYREASON_JS__', escapeForTemplate(denyReasonJS))
   .replace('__COACHING_PAGE_HTML__', escapeForTemplate(coachingPageHTML))
   .replace('__DNS_DASHBOARD_HTML__', escapeForTemplate(dnsDashboardHTML))
   .replace(/const CATEGORIES = __CATEGORY_LIST__;/g, categoryListJS.trim());
@@ -55,4 +57,5 @@ console.log('📜 Scripts bundled:');
 console.log('   - WARP info script (/cf-access/scripts/warpinfo.js)');
 console.log('   - Device info script (/cf-access/scripts/deviceinfo.js)');
 console.log('   - Posture info script (/cf-access/scripts/postureinfo.js)');
+console.log('   - Deny reason script (/cf-access/scripts/denyreason.js)');
 console.log('   - Category list (DNS dashboard)');

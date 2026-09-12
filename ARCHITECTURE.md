@@ -10,7 +10,7 @@ This project is a Cloudflare Worker that serves multiple custom pages for Zero T
 Static HTML page served when Cloudflare Gateway blocks a request. Cloudflare SWG appends query parameters (`cf_site_uri`, `cf_policy_name`, `cf_request_category_names`, etc.) which the page parses and displays to the user.
 
 ### Access Info Page (`/cf-access/`)
-Dynamic page that displays authenticated user information. Uses Cloudflare Access JWT for authentication and fetches device/posture data via Cloudflare API.
+Dynamic page that displays authenticated user information and explains **why the user was denied**. Uses Cloudflare Access JWT for authentication and fetches device/posture data plus Access application policies via the Cloudflare API.
 
 ### DNS Analytics Dashboard (`/cf-dns-dashboard/`)
 Real-time DNS analytics dashboard. Fetches data from Cloudflare's GraphQL Analytics API (`gatewayResolverQueriesAdaptiveGroups`) and renders charts using Chart.js. Supports Live mode with 10-second auto-refresh.
@@ -65,6 +65,37 @@ No re-authentication needed ✓
 - Validates `Cf-Access-Jwt-Assertion` header
 - Fetches from `/cdn-cgi/access/get-identity` and Cloudflare API
 
+#### `/cf-access/api/denyreason` (Worker API)
+- Explains why the user was denied by evaluating Access application policies against the user's identity
+- Validates `Cf-Access-Jwt-Assertion` header (401 if missing)
+- Query parameter: `original_url` — the URL the user was blocked from (appended by the Access block page redirect)
+- Requires `BEARER_TOKEN` with **Access: Apps and Policies Read** (policy evaluation) and **Access: Audit Logs Read** (failed sign-in history); degrades gracefully without them
+
+**Flow:**
+1. Fetches identity via `/cdn-cgi/access/get-identity` (email, groups, `user_uuid`, `device_id`, `account_id`)
+2. Fetches device posture via Cloudflare API and collects failing checks
+3. Resolves the Access application matching `original_url` (`/accounts/{id}/access/apps`, falling back to `/zones/{zone_id}/access/apps` via hostname)
+4. Fetches the app's policies and Access groups, then evaluates `include`/`exclude`/`require` rules locally against the user's email, groups, country (`request.cf.country`), and IP (`CF-Connecting-IP`)
+5. Queries GraphQL `accessLoginRequestsAdaptiveGroups` for the user's failed logins in the last 15 minutes and resolves application names
+
+**Reason types returned:** `blocked_by_deny_policy`, `no_allow_policy_matched`, `requirement_not_met`, `posture_check_failed`, `session_issue`, `limited`
+
+**Response structure:**
+```json
+{
+  "reason": { "type": "no_allow_policy_matched", "headline": "...", "details": "...", "errorCode": 10204 },
+  "app": { "name": "...", "domain": "...", "id": "..." },
+  "requestedUrl": "https://intranet.example.com",
+  "user": { "email": "...", "name": "...", "groups": ["..."], "country": "TH" },
+  "requirements": [ { "policyName": "...", "description": "...", "satisfied": false, "kind": "include", "userValue": "Your groups: ..." } ],
+  "failingPostureChecks": [ { "name": "...", "type": "..." } ],
+  "failedLogins": [ { "datetime": "...", "applicationName": "...", "identityProvider": "...", "country": "..." } ],
+  "capabilities": { "policyEvaluation": true, "loginHistory": true, "devicePosture": true }
+}
+```
+
+Evaluation is best-effort: Cloudflare does not expose which specific policy failed, so the worker derives it from the app's policies and the user's identity. Rules that cannot be evaluated locally (MFA, external evaluation, service tokens) are surfaced as unmet additional requirements rather than silently ignored.
+
 #### `/dns/api/*` (DNS Dashboard APIs)
 - `monthly-stats` - Total queries, allowed/blocked counts
 - `30day` - Query trends over time
@@ -79,12 +110,18 @@ No re-authentication needed ✓
 ```javascript
 if (path === '/cf-access/api/userdetails') {
   return handleUserDetails(request, env);
+} else if (path === '/cf-access/api/denyreason') {
+  return handleDenyReason(request, env);
 } else if (path.startsWith('/dns/api/')) {
   return handleDNSAPI(request, env);
 }
 ```
 
 ### Key Functions
+
+**handleDenyReason(request, env)**
+
+Explains why the user was denied: resolves the Access app from `original_url`, evaluates its policies against the user's identity/groups/country/IP, correlates failing device posture checks, and fetches recent failed sign-in events. Returns a structured reason (see `/cf-access/api/denyreason` above).
 
 **handleUserDetails(request, env)**
 

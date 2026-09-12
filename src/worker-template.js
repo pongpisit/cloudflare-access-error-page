@@ -15,12 +15,16 @@ export default {
       return getIdentityFromJWT(request);
     } else if (path === '/cf-access/api/userdetails') {
       return handleUserDetails(request, env);
+    } else if (path === '/cf-access/api/denyreason') {
+      return handleDenyReason(request, env);
     } else if (path === '/cf-access/scripts/warpinfo.js') {
       return serveWarpInfoScript();
     } else if (path === '/cf-access/scripts/deviceinfo.js') {
       return serveDeviceInfoScript();
     } else if (path === '/cf-access/scripts/postureinfo.js') {
       return servePostureInfoScript();
+    } else if (path === '/cf-access/scripts/denyreason.js') {
+      return serveDenyReasonScript();
     } else if (path === '/coaching/' || path === '/coaching') {
       return serveCoachingPage(url);
     } else if (path === '/dns/' || path === '/dns') {
@@ -309,6 +313,648 @@ async function handleUserDetails(request, env) {
   }
 }
 
+// Handle /api/denyreason - explains why the user was denied by Access
+async function handleDenyReason(request, env) {
+  const jwtAssertion = request.headers.get("Cf-Access-Jwt-Assertion");
+
+  if (!jwtAssertion) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { 'content-type': 'application/json', 'cache-control': 'no-store' },
+    });
+  }
+
+  const url = new URL(request.url);
+  const originalUrl = url.searchParams.get("original_url") || null;
+  const clientCountry = (request.cf && request.cf.country) || null;
+  const clientIp = request.headers.get("CF-Connecting-IP") || null;
+
+  const identityResponse = await getIdentityFromJWT(request);
+  if (!identityResponse.ok) {
+    return identityResponse;
+  }
+  const identityData = await identityResponse.json();
+
+  const email = identityData.email || (identityData.identity && identityData.identity.email) || null;
+  const name = identityData.name || (identityData.identity && identityData.identity.name) || null;
+  const userUuid = identityData.user_uuid || (identityData.identity && identityData.identity.user_uuid) || null;
+  const accountId = identityData.account_id || (identityData.account && identityData.account.id) || (env && env.DNS_DASHBOARD_ACCOUNT_ID) || null;
+  const deviceId = getDeviceIdFromToken(jwtAssertion)
+    || (identityData.device_sessions && identityData.device_sessions[0] && identityData.device_sessions[0].device && identityData.device_sessions[0].device.id)
+    || (identityData.identity && identityData.identity.device_id)
+    || null;
+  const userGroups = normalizeUserGroups(identityData);
+  const bearerToken = env && env.BEARER_TOKEN ? env.BEARER_TOKEN : null;
+
+  const capabilities = { policyEvaluation: false, loginHistory: false, devicePosture: false };
+  let failingPostureChecks = [];
+  let app = null;
+  let requirements = [];
+  let reason = null;
+  let failedLogins = [];
+
+  if (bearerToken && accountId && deviceId) {
+    try {
+      const postureData = await fetchDevicePosture(accountId, deviceId, bearerToken);
+      const checks = postureData && postureData.result && Array.isArray(postureData.result.checks) ? postureData.result.checks : null;
+      if (checks) {
+        capabilities.devicePosture = true;
+        failingPostureChecks = checks
+          .filter(check => check && check.success === false)
+          .map(check => ({ name: check.name || check.id || 'unnamed check', type: check.type || null }));
+      }
+    } catch (error) {
+      console.error("Deny reason: posture fetch failed:", error.message);
+    }
+  }
+
+  if (bearerToken && accountId && originalUrl) {
+    try {
+      const found = await findAccessApp(accountId, originalUrl, bearerToken);
+      if (found) {
+        app = {
+          name: found.app.name || found.app.domain || 'this application',
+          domain: found.app.domain || null,
+          id: found.app.id,
+        };
+        const policies = await fetchAppPolicies(accountId, found, bearerToken);
+        if (Array.isArray(policies)) {
+          capabilities.policyEvaluation = true;
+          const groupsMap = await fetchAccessGroupsMap(accountId, found, bearerToken);
+          const ctx = buildEvalContext(email, userGroups, clientCountry, clientIp);
+          const outcome = evaluateAccessPolicies(policies, groupsMap, ctx);
+          requirements = outcome.allowRequirements;
+          const postureNote = failingPostureChecks.length
+            ? ` Your device is also failing these posture checks: ${failingPostureChecks.map(c => c.name).join(', ')}.`
+            : '';
+
+          if (outcome.matchedDeny) {
+            reason = {
+              type: 'blocked_by_deny_policy',
+              errorCode: 10204,
+              headline: 'A Block policy denied your request',
+              details: `The Access policy "${outcome.matchedDeny.name}" on ${app.name} specifically blocks ${outcome.matchedDeny.trigger}. Contact your IT team if you believe this is a mistake.`,
+              policyName: outcome.matchedDeny.name,
+              trigger: outcome.matchedDeny.trigger,
+            };
+          } else if (outcome.allowPolicyCount > 0 && !outcome.matchedAllow && outcome.requirementCandidates.length === 0) {
+            const policyWord = outcome.allowPolicyCount === 1 ? 'policy' : 'policies';
+            reason = {
+              type: 'no_allow_policy_matched',
+              errorCode: 10204,
+              headline: `No Allow policy on ${app.name} includes your account`,
+              details: `You signed in as ${email || 'an unknown account'}, but none of the ${outcome.allowPolicyCount} Allow ${policyWord} for this application match your identity, groups, or network.${postureNote}`,
+            };
+          } else if (outcome.requirementCandidates.length > 0 && !outcome.matchedAllow) {
+            const candidate = outcome.requirementCandidates[0];
+            reason = {
+              type: 'requirement_not_met',
+              errorCode: 10204,
+              headline: 'Your account is allowed, but an extra requirement was not met',
+              details: `The Allow policy "${candidate.name}" matched your account but also requires: ${candidate.unmet.join('; ')}.`,
+              policyName: candidate.name,
+              unmet: candidate.unmet,
+            };
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Deny reason: app policy evaluation failed:", error.message);
+    }
+  }
+
+  if (bearerToken && accountId && userUuid) {
+    try {
+      const logins = await fetchFailedAccessLogins(accountId, userUuid, bearerToken);
+      if (Array.isArray(logins)) {
+        capabilities.loginHistory = true;
+        failedLogins = logins;
+      }
+    } catch (error) {
+      console.error("Deny reason: login history fetch failed:", error.message);
+    }
+  }
+
+  if (!reason) {
+    if (failingPostureChecks.length) {
+      reason = {
+        type: 'posture_check_failed',
+        errorCode: 10204,
+        headline: 'Your device failed required security checks',
+        details: `Your device did not pass: ${failingPostureChecks.map(c => c.name).join(', ')}. Fix these checks (for example, enable the Cloudflare One client, keep CrowdStrike running, or update your OS) and try again.`,
+      };
+    } else if (app) {
+      reason = {
+        type: 'session_issue',
+        errorCode: 10203,
+        headline: 'Your account meets the requirements, but your session was rejected',
+        details: 'This usually means your session expired, your sign-in was invalidated, or a requirement such as MFA or a client certificate was not satisfied at sign-in. Try signing in again.',
+      };
+    } else {
+      reason = {
+        type: 'limited',
+        headline: 'Access denied',
+        details: buildLimitedReasonDetails(capabilities, failingPostureChecks, originalUrl),
+      };
+    }
+  }
+
+  const payload = {
+    reason,
+    app,
+    requestedUrl: originalUrl,
+    user: {
+      email,
+      name,
+      groups: userGroups.map(g => g.name || g.email || g.id).filter(Boolean),
+      country: clientCountry,
+    },
+    requirements,
+    failingPostureChecks,
+    failedLogins,
+    capabilities,
+  };
+
+  return new Response(JSON.stringify(payload), {
+    headers: { 'content-type': 'application/json', 'cache-control': 'no-store' },
+  });
+}
+
+function normalizeUserGroups(identityData) {
+  const raw = identityData.groups || identityData.user_groups || [];
+  const groups = [];
+  for (const g of raw) {
+    if (typeof g === 'string') {
+      groups.push({ name: g });
+    } else if (g && typeof g === 'object') {
+      groups.push({ id: g.id, name: g.name || g.email || null, email: g.email || null });
+    }
+  }
+  return groups;
+}
+
+function buildEvalContext(email, userGroups, country, ip) {
+  const groupIds = new Set();
+  const groupNames = new Set();
+  const groupEmails = new Set();
+  for (const g of userGroups) {
+    if (g.id) groupIds.add(g.id);
+    if (g.name) groupNames.add(String(g.name).toLowerCase());
+    if (g.email) groupEmails.add(String(g.email).toLowerCase());
+  }
+  return {
+    email: (email || '').toLowerCase(),
+    country: country ? String(country).toUpperCase() : null,
+    ip: ip || null,
+    groupIds,
+    groupNames,
+    groupEmails,
+    groupNamesList: userGroups.map(g => g.name || g.email || g.id).filter(Boolean),
+  };
+}
+
+function toArray(value) {
+  if (Array.isArray(value)) return value;
+  if (value === null || value === undefined) return [];
+  return [value];
+}
+
+function ipInCidr(ip, cidr) {
+  const [base, bitsRaw] = String(cidr).split('/');
+  if (!bitsRaw) return ip === base;
+  const bits = parseInt(bitsRaw, 10);
+  if (!/^\d+\.\d+\.\d+\.\d+$/.test(ip) || !/^\d+\.\d+\.\d+\.\d+$/.test(base)) return false;
+  if (!(bits >= 0 && bits <= 32)) return false;
+  const toInt = (s) => s.split('.').reduce((acc, octet) => (((acc << 8) + parseInt(octet, 10)) >>> 0), 0);
+  const mask = bits === 0 ? 0 : (bits >= 32 ? 0xFFFFFFFF : ((0xFFFFFFFF << (32 - bits)) >>> 0));
+  return (toInt(ip) & mask) === ((toInt(base) & mask) >>> 0);
+}
+
+function describeRule(rule) {
+  if (!rule || typeof rule !== 'object') return 'An unknown requirement';
+  const keys = Object.keys(rule);
+  for (const key of keys) {
+    const val = rule[key] || {};
+    switch (key) {
+      case 'everyone': return 'Anyone';
+      case 'email': return `A specific account: ${val.email}`;
+      case 'emails': return `Specific accounts: ${toArray(val.email).join(', ')}`;
+      case 'email_domain': return `Email addresses ending in @${val.domain || val}`;
+      case 'email_domains': return `Email addresses ending in: ${toArray(val.domain || val).map(d => '@' + String(d).replace(/^@/, '')).join(', ')}`;
+      case 'group': return `Members of the Access group "${val.name || val.id || 'unknown group'}"`;
+      case 'group_email': return `Members of the Access group "${val.email}"`;
+      case 'country': return `Connections from: ${toArray(val.iso_country_code || val.iso_country_code2 || val.country).join(', ')}`;
+      case 'ip': return `Connections from IP: ${toArray(val.ip).join(', ')}`;
+      case 'any_valid_client_cert': return 'A valid client certificate (mTLS)';
+      case 'common_name': return `A client certificate with common name "${val.common_name}"`;
+      case 'any_valid_service_token':
+      case 'any_issuer_service_token': return 'A valid service token';
+      case 'device_posture': return `A device passing the posture rule "${val.integration_uid || val.id || 'unknown'}"`;
+      case 'auth_method': return 'Recent multi-factor authentication (MFA)';
+      case 'auth_context': return 'A specific authentication context (Okta)';
+      case 'gsuite': return 'Sign-in with Google Workspace';
+      case 'github': return 'Sign-in with GitHub';
+      case 'azure': return 'Sign-in with Microsoft Entra ID';
+      case 'okta': return 'Sign-in with Okta';
+      case 'saml': return 'Sign-in with a SAML identity provider';
+      case 'external_eval': return 'Passing an external evaluation';
+      default: return `${key}: ${JSON.stringify(val).slice(0, 100)}`;
+    }
+  }
+  return 'An unknown requirement';
+}
+
+function matchRule(rule, ctx, groupsMap) {
+  if (!rule || typeof rule !== 'object') return null;
+  const key = Object.keys(rule)[0];
+  const val = rule[key] || {};
+  switch (key) {
+    case 'everyone':
+      return true;
+    case 'email':
+      return Boolean(ctx.email) && ctx.email === String(val.email || '').toLowerCase();
+    case 'emails':
+      return toArray(val.email).some(e => ctx.email === String(e).toLowerCase());
+    case 'email_domain': {
+      if (!ctx.email) return false;
+      const domain = String(val.domain || val).toLowerCase().replace(/^@/, '');
+      return ctx.email.split('@')[1] === domain;
+    }
+    case 'email_domains': {
+      if (!ctx.email) return false;
+      const domains = toArray(val.domain || val).map(d => String(d).toLowerCase().replace(/^@/, ''));
+      return domains.includes(ctx.email.split('@')[1]);
+    }
+    case 'group': {
+      const groupId = val.id || val;
+      if (!groupId) return null;
+      if (ctx.groupIds.has(groupId)) return true;
+      const knownGroup = groupsMap.get(groupId);
+      if (knownGroup && knownGroup.name && ctx.groupNames.has(String(knownGroup.name).toLowerCase())) return true;
+      return false;
+    }
+    case 'group_email': {
+      const groupEmail = String(val.email || '').toLowerCase();
+      return ctx.groupEmails.has(groupEmail) || ctx.groupNames.has(groupEmail);
+    }
+    case 'country': {
+      if (!ctx.country) return null;
+      const countries = toArray(val.iso_country_code || val.iso_country_code2 || val.country).map(c => String(c).toUpperCase());
+      return countries.includes(ctx.country);
+    }
+    case 'ip': {
+      if (!ctx.ip) return null;
+      return toArray(val.ip).some(entry => ipInCidr(ctx.ip, String(entry)));
+    }
+    default:
+      return null;
+  }
+}
+
+function userValueForRule(rule, ctx) {
+  const key = Object.keys(rule || {})[0];
+  switch (key) {
+    case 'email':
+    case 'emails':
+    case 'email_domain':
+    case 'email_domains':
+      return ctx.email ? `Your email: ${ctx.email}` : '';
+    case 'group':
+    case 'group_email':
+      return ctx.groupNamesList.length ? `Your groups: ${ctx.groupNamesList.join(', ')}` : 'Your groups: none';
+    case 'country':
+      return ctx.country ? `You are connecting from: ${ctx.country}` : '';
+    case 'ip':
+      return ctx.ip ? `Your IP: ${ctx.ip}` : '';
+    default:
+      return '';
+  }
+}
+
+function evaluateAccessPolicies(policies, groupsMap, ctx) {
+  const outcome = {
+    matchedDeny: null,
+    matchedAllow: null,
+    requirementCandidates: [],
+    allowRequirements: [],
+    allowPolicyCount: 0,
+  };
+
+  for (const policy of policies) {
+    const decision = String(policy.decision || '').toLowerCase();
+    const includeRules = Array.isArray(policy.include) ? policy.include : [];
+    const excludeRules = Array.isArray(policy.exclude) ? policy.exclude : [];
+    const requireRules = Array.isArray(policy.require) ? policy.require : [];
+
+    const includeResults = includeRules.map(r => ({ rule: r, matched: matchRule(r, ctx, groupsMap), text: describeRule(r) }));
+    const excludeResults = excludeRules.map(r => ({ rule: r, matched: matchRule(r, ctx, groupsMap), text: describeRule(r) }));
+    const requireResults = requireRules.map(r => ({ rule: r, matched: matchRule(r, ctx, groupsMap), text: describeRule(r) }));
+
+    const includeMatched = includeResults.some(r => r.matched === true);
+    const excluded = excludeResults.some(r => r.matched === true);
+
+    if (decision === 'deny' || decision === 'block') {
+      if (includeMatched && !excluded && !outcome.matchedDeny) {
+        const trigger = includeResults.find(r => r.matched === true);
+        outcome.matchedDeny = {
+          name: policy.name,
+          trigger: trigger ? trigger.text : 'your account or network',
+        };
+      }
+      continue;
+    }
+
+    if (decision !== 'allow') continue;
+
+    outcome.allowPolicyCount += 1;
+
+    if (includeMatched && !excluded) {
+      const unmetRequires = requireResults.filter(r => r.matched !== true);
+      if (unmetRequires.length === 0) {
+        if (!outcome.matchedAllow) outcome.matchedAllow = { name: policy.name };
+      } else {
+        outcome.requirementCandidates.push({
+          name: policy.name,
+          unmet: unmetRequires.map(r => r.text),
+        });
+      }
+      continue;
+    }
+
+    const rows = [];
+    if (excluded && includeMatched) {
+      rows.push({
+        policyName: policy.name,
+        description: 'Your account matches an exclusion rule on this policy',
+        kind: 'exclude',
+        satisfied: false,
+        userValue: '',
+      });
+    } else {
+      for (const r of includeResults) {
+        if (r.matched === true) continue;
+        rows.push({
+          policyName: policy.name,
+          description: r.text,
+          kind: 'include',
+          satisfied: false,
+          userValue: userValueForRule(r.rule, ctx),
+        });
+      }
+    }
+    for (const r of requireResults) {
+      rows.push({
+        policyName: policy.name,
+        description: r.text,
+        kind: 'require',
+        satisfied: r.matched === true,
+        userValue: userValueForRule(r.rule, ctx),
+      });
+    }
+    if (rows.length) outcome.allowRequirements.push(...rows);
+  }
+
+  return outcome;
+}
+
+async function cfApiGetAll(path, token, maxPages = 10) {
+  const results = [];
+  const separator = path.includes('?') ? '&' : '?';
+  for (let page = 1; page <= maxPages; page++) {
+    const response = await fetch(`https://api.cloudflare.com/client/v4${path}${separator}per_page=50&page=${page}`, {
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    });
+    if (!response.ok) throw new Error(`API request failed (${path}): ${response.status}`);
+    const data = await response.json();
+    if (!data.success) {
+      const message = data.errors && data.errors[0] ? data.errors[0].message : 'unknown error';
+      throw new Error(`API request failed (${path}): ${message}`);
+    }
+    results.push(...(Array.isArray(data.result) ? data.result : []));
+    const totalPages = (data.result_info && data.result_info.total_pages) || 1;
+    if (page >= totalPages) break;
+  }
+  return results;
+}
+
+async function lookupZoneIdForHost(hostname, token) {
+  const labels = hostname.split('.');
+  const candidates = [];
+  if (labels.length >= 2) candidates.push(labels.slice(-2).join('.'));
+  if (labels.length >= 3) candidates.push(labels.slice(-3).join('.'));
+  for (const candidate of candidates) {
+    try {
+      const zones = await cfApiGetAll(`/zones?name=${encodeURIComponent(candidate)}`, token, 2);
+      if (zones.length > 0 && zones[0].id) return zones[0].id;
+    } catch (error) {
+      console.error(`Deny reason: zone lookup failed for ${candidate}:`, error.message);
+    }
+  }
+  return null;
+}
+
+function appDomainMatches(appDomain, hostname, path) {
+  if (!appDomain || typeof appDomain !== 'string') return false;
+  let domainHost = appDomain;
+  let domainPath = '';
+  const slashIndex = appDomain.indexOf('/');
+  if (slashIndex !== -1) {
+    domainHost = appDomain.slice(0, slashIndex);
+    domainPath = appDomain.slice(slashIndex);
+  }
+  let hostMatches = domainHost === hostname;
+  if (!hostMatches && domainHost.startsWith('*.')) {
+    hostMatches = hostname.endsWith(domainHost.slice(1));
+  }
+  if (!hostMatches) return false;
+  if (domainPath) {
+    const normalizedPath = path || '/';
+    return normalizedPath === domainPath || normalizedPath.startsWith(domainPath.endsWith('/') ? domainPath : domainPath + '/');
+  }
+  return true;
+}
+
+function pickBestApp(apps, hostname, path) {
+  const matches = apps.filter(app => appDomainMatches(app.domain, hostname, path));
+  if (matches.length === 0) return null;
+  matches.sort((a, b) => String(b.domain || '').length - String(a.domain || '').length);
+  return matches[0];
+}
+
+async function findAccessApp(accountId, originalUrl, token) {
+  let hostname = null;
+  let path = '/';
+  try {
+    const parsed = new URL(originalUrl);
+    hostname = parsed.hostname;
+    path = parsed.pathname || '/';
+  } catch (error) {
+    try {
+      const parsed = new URL('https://' + originalUrl);
+      hostname = parsed.hostname;
+      path = parsed.pathname || '/';
+    } catch (innerError) {
+      return null;
+    }
+  }
+  if (!hostname) return null;
+
+  try {
+    const apps = await cfApiGetAll(`/accounts/${accountId}/access/apps`, token);
+    const match = pickBestApp(apps, hostname, path);
+    if (match) return { app: match, scope: 'account', zoneId: null };
+  } catch (error) {
+    console.error("Deny reason: account app lookup failed:", error.message);
+  }
+
+  const zoneId = await lookupZoneIdForHost(hostname, token);
+  if (zoneId) {
+    try {
+      const apps = await cfApiGetAll(`/zones/${zoneId}/access/apps`, token);
+      const match = pickBestApp(apps, hostname, path);
+      if (match) return { app: match, scope: 'zone', zoneId };
+    } catch (error) {
+      console.error("Deny reason: zone app lookup failed:", error.message);
+    }
+  }
+
+  return null;
+}
+
+async function fetchAppPolicies(accountId, found, token) {
+  const base = found.scope === 'zone'
+    ? `/zones/${found.zoneId}/access/apps/${found.app.id}/policies`
+    : `/accounts/${accountId}/access/apps/${found.app.id}/policies`;
+  return cfApiGetAll(base, token);
+}
+
+async function fetchAccessGroupsMap(accountId, found, token) {
+  const base = found.scope === 'zone'
+    ? `/zones/${found.zoneId}/access/groups`
+    : `/accounts/${accountId}/access/groups`;
+  const groupsMap = new Map();
+  try {
+    const groups = await cfApiGetAll(base, token);
+    for (const group of groups) {
+      groupsMap.set(group.id, { name: group.name, email: group.email || null });
+    }
+  } catch (error) {
+    console.error("Deny reason: group lookup failed:", error.message);
+  }
+  return groupsMap;
+}
+
+async function fetchFailedAccessLogins(accountId, userUuid, token) {
+  const query = `
+    query {
+      viewer {
+        accounts(filter: {accountTag: "${accountId}"}) {
+          accessLoginRequestsAdaptiveGroups(
+            limit: 10,
+            filter: {
+              datetime_geq: "${new Date(Date.now() - 15 * 60000).toISOString()}",
+              datetime_leq: "${new Date().toISOString()}",
+              userUuid: "${userUuid}",
+              isSuccessfulLogin: 0
+            },
+            orderBy: [datetime_DESC]
+          ) {
+            dimensions {
+              datetime
+              isSuccessfulLogin
+              hasWarpEnabled
+              hasGatewayEnabled
+              ipAddress
+              userUuid
+              identityProvider
+              country
+              deviceId
+              mtlsStatus
+              approvingPolicyId
+              appId
+            }
+          }
+        }
+      }
+    }`;
+
+  const response = await fetch("https://api.cloudflare.com/client/v4/graphql", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ query }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Deny reason: failed to fetch Access login history:", errorText);
+    return null;
+  }
+
+  const data = await response.json();
+  if (data.errors && data.errors.length) {
+    console.error("Deny reason: GraphQL errors for login history:", JSON.stringify(data.errors));
+    return null;
+  }
+
+  const accountNode = data && data.data && data.data.viewer && data.data.viewer.accounts && data.data.viewer.accounts[0];
+  const events = accountNode ? (accountNode.accessLoginRequestsAdaptiveGroups || []) : [];
+  if (events.length === 0) return [];
+
+  const appIds = [...new Set(events.map(e => e.dimensions.appId).filter(Boolean))];
+  const appNameById = await fetchAppNames(accountId, appIds, token);
+
+  return events.map(e => ({
+    datetime: e.dimensions.datetime,
+    appId: e.dimensions.appId || null,
+    applicationName: e.dimensions.appId ? (appNameById.get(e.dimensions.appId) || 'Unknown application') : 'Unknown application',
+    identityProvider: e.dimensions.identityProvider || null,
+    country: e.dimensions.country || null,
+    ipAddress: e.dimensions.ipAddress || null,
+    mtlsStatus: e.dimensions.mtlsStatus || null,
+    warpEnabled: e.dimensions.hasWarpEnabled === 1,
+    gatewayEnabled: e.dimensions.hasGatewayEnabled === 1,
+  }));
+}
+
+async function fetchAppNames(accountId, appIds, token) {
+  const names = new Map();
+  await Promise.all(appIds.map(async (appId) => {
+    try {
+      const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${accountId}/access/apps/${appId}`, {
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.result && data.result.name) {
+          names.set(appId, data.result.name);
+          return;
+        }
+      }
+    } catch (error) {
+      console.error(`Deny reason: failed to fetch app name for appId ${appId}:`, error.message);
+    }
+    names.set(appId, 'Unknown application');
+  }));
+  return names;
+}
+
+function buildLimitedReasonDetails(capabilities, failingPostureChecks, originalUrl) {
+  let details = 'You were denied by a Cloudflare Access policy, but detailed policy information is not available for this request.';
+  if (originalUrl) {
+    details += ` The application at ${originalUrl} could not be matched to an Access application in this account.`;
+  }
+  if (!capabilities.policyEvaluation) {
+    details += ' To see the exact policy that denied you, configure the BEARER_TOKEN secret with Access: Apps and Policies Read permission.';
+  }
+  if (!capabilities.loginHistory) {
+    details += ' To see recent failed sign-ins, the token also needs Access: Audit Logs Read permission.';
+  }
+  if (failingPostureChecks.length) {
+    details += ` Note: your device is failing these posture checks: ${failingPostureChecks.map(c => c.name).join(', ')}.`;
+  }
+  return details;
+}
+
 // Serve Gateway Block Page
 function serveGatewayPage(url) {
   const gatewayPageHTML = `__GATEWAY_PAGE_HTML__`;
@@ -362,6 +1008,18 @@ function servePostureInfoScript() {
   const postureInfoJS = `__POSTUREINFO_JS__`;
   
   return new Response(postureInfoJS, {
+    headers: {
+      'content-type': 'application/javascript;charset=UTF-8',
+      'cache-control': 'public, max-age=3600',
+    },
+  });
+}
+
+// Serve Deny Reason Script
+function serveDenyReasonScript() {
+  const denyReasonJS = `__DENYREASON_JS__`;
+  
+  return new Response(denyReasonJS, {
     headers: {
       'content-type': 'application/javascript;charset=UTF-8',
       'cache-control': 'public, max-age=3600',

@@ -442,6 +442,153 @@
         font-size: 14px;
     }
 
+    /* Deny reason card */
+    .reason-chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        background: rgba(245, 158, 11, 0.12);
+        color: var(--accent-warning);
+        border: 1px solid rgba(245, 158, 11, 0.35);
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        vertical-align: middle;
+        margin-left: 12px;
+        white-space: nowrap;
+    }
+
+    .reason-headline {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+        letter-spacing: -0.01em;
+        line-height: 1.4;
+    }
+
+    .reason-details {
+        font-size: 14px;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        margin-bottom: 8px;
+    }
+
+    .req-row {
+        display: flex;
+        gap: 10px;
+        padding: 10px 12px;
+        border: 1px solid var(--border-secondary);
+        border-radius: 8px;
+        background: var(--bg-tertiary);
+        align-items: flex-start;
+        font-size: 13px;
+    }
+
+    .req-row + .req-row {
+        margin-top: 8px;
+    }
+
+    .req-icon {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+
+    .req-icon.success { color: var(--accent-success); }
+    .req-icon.fail { color: var(--accent-error); }
+    .req-icon.unknown { color: var(--accent-warning); }
+
+    .req-text { color: var(--text-primary); }
+    .req-policy { color: var(--text-tertiary); font-size: 12px; }
+    .req-user-value { color: var(--text-secondary); font-size: 12px; margin-top: 2px; }
+
+    .section-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin: 12px 0 8px;
+    }
+
+    .next-steps {
+        margin: 4px 0 0;
+        padding-left: 20px;
+        font-size: 14px;
+        color: var(--text-secondary);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 16px;
+    }
+
+    .secondary-button {
+        background: var(--bg-tertiary);
+        color: var(--text-primary);
+        border: 1px solid var(--border-primary);
+        padding: 12px 28px;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .secondary-button:hover {
+        background: var(--bg-hover);
+        transform: translateY(-1px);
+    }
+
+    .logins-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+    .logins-table th {
+        text-align: left;
+        padding: 8px 10px;
+        color: var(--text-secondary);
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 1px solid var(--border-primary);
+    }
+
+    .logins-table td {
+        padding: 8px 10px;
+        color: var(--text-primary);
+        border-bottom: 1px solid var(--border-secondary);
+        word-break: break-word;
+    }
+
+    .logins-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .status-chip {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        background: rgba(220, 38, 38, 0.1);
+        color: var(--accent-error);
+    }
+
     /* JSON Syntax Highlighting */
     .json-key {
         color: #0066cc;
@@ -613,6 +760,22 @@
             </div>
 
             <div class="tiles-grid">
+                <div class="tile loading" id="reason-tile" style="grid-column: 1 / -1;">
+                    <div class="tile-header">
+                        <div class="tile-icon" style="background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.2);">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: #f59e0b;" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.546-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h2 class="text-heading-16 font-medium m-0 w-max whitespace-nowrap overflow-hidden text-ellipsis flex-1 mr-0">Why you were denied</h2>
+                    </div>
+                    <div class="tile-content" id="reason-content">
+                        <div style="text-align: center; padding: 20px;" role="status" aria-label="Loading deny reason">
+                            <div class="loading-spinner"></div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="tile loading" id="warp-tile">
                     <div class="tile-header">
                         <div class="tile-icon" style="background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.2);">
@@ -662,6 +825,19 @@
                 </div>
             </div>
 
+            <!-- Failed sign-ins section - Full Width -->
+            <div class="tile" id="logins-tile" style="margin-top: 20px; display: none;">
+                <div class="tile-header">
+                    <div class="tile-icon" style="background: rgba(220, 38, 38, 0.1); border-color: rgba(220, 38, 38, 0.2);">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: #dc2626;" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h2 class="text-heading-16 font-medium m-0 w-max whitespace-nowrap overflow-hidden text-ellipsis flex-1 mr-0">Recent failed sign-ins (last 15 minutes)</h2>
+                </div>
+                <div class="tile-content" id="logins-content"></div>
+            </div>
+
             <!-- Debug Section - Full Width -->
             <div class="tile" id="debug-tile" style="margin-top: 20px; grid-column: 1 / -1;">
                 <div class="tile-header" style="padding-bottom: 0; border-bottom: none; margin-bottom: 0;">
@@ -696,7 +872,12 @@
 <script src="/cf-access/scripts/warpinfo.js"></script>
 <script src="/cf-access/scripts/deviceinfo.js"></script>
 <script src="/cf-access/scripts/postureinfo.js"></script>
+<script src="/cf-access/scripts/denyreason.js"></script>
 <script>
+    const IT_SUPPORT_EMAIL = 'it-support@example.com';
+    const pageUrlParams = new URLSearchParams(window.location.search);
+    const originalUrl = pageUrlParams.get('original_url');
+
     const themeToggle = document.getElementById('theme-toggle');
     const sunIcon = document.getElementById('theme-icon-sun');
     const moonIcon = document.getElementById('theme-icon-moon');
@@ -761,6 +942,173 @@
         } else {
             window.location.reload();
         }
+    }
+
+    function esc(value) {
+        return String(value == null ? '' : value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    function nextStepsFor(data) {
+        const type = data && data.reason ? data.reason.type : 'limited';
+        const steps = [];
+        if (type === 'no_allow_policy_matched') {
+            steps.push('Check that you are signed in with the correct account (your email is listed below).');
+            steps.push('Ask your IT team to add your account, or one of your Access groups, to an Allow policy for this application.');
+        } else if (type === 'blocked_by_deny_policy') {
+            steps.push('A Block policy specifically denies your account or network — contact IT with the details below.');
+            steps.push('If you were on a different network or VPN, try again from your usual work network.');
+        } else if (type === 'requirement_not_met') {
+            steps.push('Complete the additional requirements listed above (for example MFA or a client certificate), then sign in again.');
+        } else if (type === 'posture_check_failed') {
+            steps.push('Turn on the Cloudflare One client (WARP) on this device.');
+            steps.push('Make your device pass the failing checks listed above (CrowdStrike running, OS up to date, disk encryption), then try again.');
+        } else if (type === 'session_issue') {
+            steps.push('Use the Reload Access Application button above to sign in again.');
+            steps.push('If it keeps failing, clear cookies for this site and sign in again.');
+        } else {
+            steps.push('Review your account, device, and posture details below and contact IT if anything looks wrong.');
+        }
+        steps.push('Contact IT support using the button below so they can look up your request.');
+        return steps;
+    }
+
+    function supportSummaryText(data) {
+        const lines = [];
+        lines.push('I was denied access by Cloudflare Access.');
+        if (data.reason) {
+            lines.push('Reason: ' + data.reason.type + (data.reason.errorCode ? ' (error ' + data.reason.errorCode + ': ' + (accessErrorText(data.reason.errorCode) || '') + ')' : ''));
+            lines.push('Details: ' + data.reason.details);
+        }
+        if (data.requestedUrl) lines.push('Application URL: ' + data.requestedUrl);
+        if (data.app && data.app.name) lines.push('Application: ' + data.app.name);
+        if (data.user) {
+            if (data.user.email) lines.push('My email: ' + data.user.email);
+            if (data.user.country) lines.push('My country: ' + data.user.country);
+        }
+        if (Array.isArray(data.failingPostureChecks) && data.failingPostureChecks.length) {
+            lines.push('Failing posture checks: ' + data.failingPostureChecks.map(c => c.name).join(', '));
+        }
+        lines.push('Time: ' + new Date().toISOString());
+        return lines.join('\n');
+    }
+
+    function copySupportDetails() {
+        const summary = window.__denyReasonData ? supportSummaryText(window.__denyReasonData) : '';
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(summary);
+        }
+    }
+
+    function renderReasonInfo(data) {
+        const tile = document.getElementById('reason-tile');
+        const content = document.getElementById('reason-content');
+        tile.classList.remove('loading');
+
+        if (!data || data.error) {
+            tile.classList.add('error');
+            content.innerHTML = `
+                <div class="error-message">
+                    <svg class="status-icon error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    <span>${esc(data && data.error ? data.error : 'Failed to load deny reason')}</span>
+                </div>
+            `;
+            return;
+        }
+
+        const reason = data.reason || {};
+        const errorText = typeof accessErrorText === 'function' ? accessErrorText(reason.errorCode) : null;
+        const chip = reason.errorCode
+            ? `<span class="reason-chip">${esc('Error ' + reason.errorCode + (errorText ? ' — ' + errorText : ''))}</span>`
+            : '';
+
+        const requirementsHtml = Array.isArray(data.requirements) && data.requirements.length ? `
+            <div class="section-label">What this application requires vs. what you have</div>
+            ${data.requirements.map(r => `
+                <div class="req-row">
+                    <svg class="req-icon ${r.satisfied === true ? 'success' : 'fail'}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        ${r.satisfied === true
+                            ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />'
+                            : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />'}
+                    </svg>
+                    <div>
+                        <div class="req-text">${esc(r.description)}</div>
+                        ${r.userValue ? `<div class="req-user-value">${esc(r.userValue)}</div>` : ''}
+                        ${r.policyName ? `<div class="req-policy">Policy: ${esc(r.policyName)}${r.kind === 'require' ? ' (additional requirement)' : ''}</div>` : ''}
+                    </div>
+                </div>`).join('')}
+        ` : '';
+
+        const postureHtml = Array.isArray(data.failingPostureChecks) && data.failingPostureChecks.length ? `
+            <div class="section-label">Failing device posture checks</div>
+            ${data.failingPostureChecks.map(c => `
+                <div class="req-row">
+                    <svg class="req-icon fail" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    <div class="req-text">${esc(c.name)}</div>
+                </div>`).join('')}
+        ` : '';
+
+        const stepsHtml = nextStepsFor(data).map(s => `<li>${esc(s)}</li>`).join('');
+        const appName = data.app && data.app.name ? data.app.name : (data.requestedUrl || 'Cloudflare Access application');
+        const mailto = 'mailto:' + IT_SUPPORT_EMAIL +
+            '?subject=' + encodeURIComponent('Access denied: ' + appName) +
+            '&body=' + encodeURIComponent(supportSummaryText(data));
+
+        content.innerHTML = `
+            <div class="reason-headline">${esc(reason.headline || 'Access denied')}${chip}</div>
+            <div class="reason-details">${esc(reason.details || '')}</div>
+            ${requirementsHtml}
+            ${postureHtml}
+            <ol class="next-steps">${stepsHtml}</ol>
+            <div class="action-buttons">
+                <button onclick="reloadApplication()" class="primary-button">Try again</button>
+                <a href="${esc(mailto)}" class="secondary-button">Contact IT</a>
+                <button onclick="copySupportDetails()" class="secondary-button">Copy details for IT</button>
+            </div>
+        `;
+    }
+
+    function renderFailedLogins(data) {
+        const tile = document.getElementById('logins-tile');
+        const content = document.getElementById('logins-content');
+        if (!data || data.error || !data.capabilities || !data.capabilities.loginHistory || !Array.isArray(data.failedLogins) || data.failedLogins.length === 0) {
+            tile.style.display = 'none';
+            return;
+        }
+
+        const rows = data.failedLogins.map(l => {
+            const when = l.datetime ? new Date(l.datetime).toLocaleString() : 'Unknown';
+            let reasonLabel = 'Blocked by policy';
+            if (l.gatewayEnabled === false) reasonLabel = 'Gateway not enabled';
+            else if (l.warpEnabled === false) reasonLabel = 'WARP not enabled';
+            return `
+                <tr>
+                    <td>${esc(when)}</td>
+                    <td>${esc(l.applicationName || 'Unknown application')}</td>
+                    <td>${esc(l.identityProvider || 'Unknown')}</td>
+                    <td>${esc(l.country || 'Unknown')}</td>
+                    <td><span class="status-chip">${esc(reasonLabel)}</span></td>
+                </tr>`;
+        }).join('');
+
+        content.innerHTML = `
+            <table class="logins-table">
+                <thead>
+                    <tr>
+                        <th scope="col">When</th>
+                        <th scope="col">Application</th>
+                        <th scope="col">Signed in via</th>
+                        <th scope="col">From</th>
+                        <th scope="col">Reason</th>
+                    </tr>
+                </thead>
+                <tbody>${rows}</tbody>
+            </table>
+        `;
+        tile.style.display = 'block';
     }
 
     function renderWarpInfo(data) {
@@ -938,8 +1286,23 @@
         return null;
     }
 
+    async function loadDenyReason() {
+        try {
+            const denyReasonData = await getDenyReasonInfo(originalUrl);
+            window.__denyReasonData = denyReasonData;
+            renderReasonInfo(denyReasonData);
+            renderFailedLogins(denyReasonData);
+        } catch (error) {
+            renderReasonInfo({ error: 'Failed to load deny reason' });
+            renderFailedLogins(null);
+        }
+    }
+
     async function loadData() {
         try {
+            // Load the deny reason alongside user details
+            loadDenyReason();
+
             // Fetch combined user details (identity + device + posture)
             const userDetailsResponse = await fetch('/cf-access/api/userdetails');
             
@@ -969,7 +1332,8 @@
                 identity: identityData,
                 device: apiDeviceData,
                 posture: apiPostureData,
-                deviceIdFromJWT: deviceId
+                deviceIdFromJWT: deviceId,
+                denyReason: window.__denyReasonData || null
             };
             debugJson.innerHTML = syntaxHighlightJSON(debugData);
             
