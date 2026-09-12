@@ -47,13 +47,41 @@ function getDeviceIdFromToken(jwt) {
   return null;
 }
 
-// Get identity using Cf-Access-Jwt-Assertion header (Cloudflare's official method)
-async function getIdentityFromJWT(request) {
-  const jwtAssertion = request.headers.get("Cf-Access-Jwt-Assertion");
-  
-  if (!jwtAssertion) {
-    return new Response(JSON.stringify({ 
-      error: "Unauthorized - No JWT assertion found" 
+// Resolve the Access JWT: the Cf-Access-Jwt-Assertion header (page behind its
+// own Access application) or the CF_Authorization session cookie (page host has
+// no Access app, but the org cookie domain spans it).
+function getAccessJwt(request) {
+  const headerJwt = request.headers.get("Cf-Access-Jwt-Assertion");
+  if (headerJwt) {
+    return { jwt: headerJwt, source: 'header' };
+  }
+  const cookieHeader = request.headers.get("Cookie") || '';
+  const match = cookieHeader.match(/(?:^|;\s*)CF_Authorization=([^;]+)/);
+  if (match) {
+    return { jwt: match[1], source: 'cookie' };
+  }
+  return null;
+}
+
+function hostFromOriginalUrl(originalUrl) {
+  if (!originalUrl) return null;
+  try {
+    return new URL(originalUrl.includes('://') ? originalUrl : 'https://' + originalUrl).host || null;
+  } catch (error) {
+    return null;
+  }
+}
+
+// Get identity using the Access JWT. identityHost optionally targets a different
+// host's get-identity (used when the JWT came from a session cookie issued by
+// the blocked application, so it can only be validated on that application's host).
+async function getIdentityFromJWT(request, identityHost) {
+  const jwtInfo = getAccessJwt(request);
+
+  if (!jwtInfo) {
+    return new Response(JSON.stringify({
+      error: "Unauthorized - No JWT assertion found",
+      code: "missing_access_jwt"
     }), {
       status: 401,
       headers: {
@@ -62,28 +90,30 @@ async function getIdentityFromJWT(request) {
       },
     });
   }
-  
+
   try {
     // Fetch identity from get-identity endpoint using JWT assertion as cookie
     // This follows Cloudflare's official implementation pattern
     const url = new URL(request.url);
-    const identityUrl = `${url.protocol}//${url.host}/cdn-cgi/access/get-identity`;
-    
+    const identityUrl = identityHost
+      ? `https://${identityHost}/cdn-cgi/access/get-identity`
+      : `${url.protocol}//${url.host}/cdn-cgi/access/get-identity`;
+
     const identityResponse = await fetch(identityUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Cookie': `CF_Authorization=${jwtAssertion}`
+        'Cookie': `CF_Authorization=${jwtInfo.jwt}`
       }
     });
-    
+
     if (!identityResponse.ok) {
       const errorText = await identityResponse.text();
       throw new Error(`Identity fetch failed: ${identityResponse.status} - ${errorText}`);
     }
-    
+
     const identityData = await identityResponse.json();
-    
+
     return new Response(JSON.stringify(identityData), {
       headers: {
         'content-type': 'application/json',
@@ -167,23 +197,29 @@ async function fetchDevicePosture(gateway_account_id, device_id, bearerToken) {
 
 // Handle /api/userdetails - combines identity, device details, and posture
 async function handleUserDetails(request, env) {
-  const jwtAssertion = request.headers.get("Cf-Access-Jwt-Assertion");
+  const jwtInfo = getAccessJwt(request);
 
-  if (!jwtAssertion) {
+  if (!jwtInfo) {
     return new Response(JSON.stringify({ error: "Unauthorized", code: "missing_access_jwt" }), {
       status: 401,
       headers: { 'content-type': 'application/json', 'cache-control': 'no-store' },
     });
   }
 
+  const jwtAssertion = jwtInfo.jwt;
+  const requestUrl = new URL(request.url);
+  const identityHost = jwtInfo.source === 'cookie'
+    ? hostFromOriginalUrl(requestUrl.searchParams.get("original_url") || null)
+    : null;
+
   // Extract device_id from token
   let device_id = getDeviceIdFromToken(jwtAssertion);
 
   if (!device_id) {
     console.warn("Device ID not found in token, attempting to fetch from get-identity");
-    
+
     // Fallback - fetch identity data to retrieve device_id
-    const identityResponse = await getIdentityFromJWT(request);
+    const identityResponse = await getIdentityFromJWT(request, identityHost);
     if (!identityResponse.ok) {
       return identityResponse;
     }
@@ -201,7 +237,7 @@ async function handleUserDetails(request, env) {
 
   try {
     // Fetch identity data
-    const identityResponse = await getIdentityFromJWT(request);
+    const identityResponse = await getIdentityFromJWT(request, identityHost);
     if (!identityResponse.ok) {
       return identityResponse;
     }
@@ -274,21 +310,23 @@ async function handleUserDetails(request, env) {
 
 // Handle /api/denyreason - explains why the user was denied by Access
 async function handleDenyReason(request, env) {
-  const jwtAssertion = request.headers.get("Cf-Access-Jwt-Assertion");
+  const jwtInfo = getAccessJwt(request);
 
-  if (!jwtAssertion) {
+  if (!jwtInfo) {
     return new Response(JSON.stringify({ error: "Unauthorized", code: "missing_access_jwt" }), {
       status: 401,
       headers: { 'content-type': 'application/json', 'cache-control': 'no-store' },
     });
   }
 
+  const jwtAssertion = jwtInfo.jwt;
   const url = new URL(request.url);
   const originalUrl = url.searchParams.get("original_url") || null;
+  const identityHost = jwtInfo.source === 'cookie' ? hostFromOriginalUrl(originalUrl) : null;
   const clientCountry = (request.cf && request.cf.country) || null;
   const clientIp = request.headers.get("CF-Connecting-IP") || null;
 
-  const identityResponse = await getIdentityFromJWT(request);
+  const identityResponse = await getIdentityFromJWT(request, identityHost);
   if (!identityResponse.ok) {
     return identityResponse;
   }

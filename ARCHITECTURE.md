@@ -68,6 +68,8 @@ Page renders the deny reason, details, and next steps
 - Query parameter: `original_url` — the URL the user was blocked from (appended by the Access block page redirect)
 - Requires `BEARER_TOKEN` with **Access: Apps and Policies Read** (policy evaluation) and **Access: Audit Logs Read** (failed sign-in history); degrades gracefully without them
 
+**Session sources:** the Access JWT is resolved from the `Cf-Access-Jwt-Assertion` header (page behind its own Access application) or, as a fallback, from the `CF_Authorization` session cookie sent by the browser when the Zero Trust cookie domain spans the page host. With the cookie fallback, identity is validated against the blocked application's `get-identity` endpoint (host resolved from `original_url`), because the session was issued for that application.
+
 **Flow:**
 1. Fetches identity via `/cdn-cgi/access/get-identity` (email, groups, `user_uuid`, `device_id`, `account_id`)
 2. Fetches device posture via Cloudflare API and collects failing checks

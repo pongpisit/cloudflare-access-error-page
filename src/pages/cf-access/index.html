@@ -1075,7 +1075,7 @@
             const onWorkersDev = /\.workers\.dev$/i.test(String(host));
             const hint = onWorkersDev
                 ? 'Your identity could not be verified because this page is served on a *.workers.dev URL, which cannot be placed behind Cloudflare Access. Bind the Worker to your Access-protected custom domain and point the Access block-page redirects there.'
-                : 'Your identity could not be verified because requests to ' + host + ' are not passing through Cloudflare Access. Create a self-hosted Access application for ' + host + ' and leave its path empty — the app must cover this page and its /cf-access/api/* calls (a path-scoped app such as /cf-access only protects that one path). Also set the Zero Trust cookie domain to your parent domain so a user blocked from another app arrives here already signed in.';
+                : 'Your identity could not be verified because requests to ' + host + ' are not passing through Cloudflare Access, and no Access session cookie was sent to this page. Fix either way: (a) create a self-hosted Access application for ' + host + ' with the path left empty, or (b) set the Zero Trust cookie domain to your parent domain — the page then validates your existing session from the blocked application automatically.';
             return {
                 error: 'No Cloudflare Access session on this page',
                 stamp: 'No session',
@@ -1086,7 +1086,7 @@
             return {
                 error: 'Access session could not be resolved',
                 stamp: 'Unavailable',
-                hint: 'The worker could not read your identity. This happens when the page is not deployed on an Access-protected custom domain — /cdn-cgi/access/get-identity does not exist on *.workers.dev. If you are the administrator, bind the Worker to your domain behind Access and open the page from there.'
+                hint: 'The worker could not validate an Access session for you. This happens when the session cookie is missing, expired, or scoped to a different application, or when the page is not on an Access-protected custom domain (*.workers.dev has no /cdn-cgi/access/get-identity). If you are the administrator, check the page\u2019s Access application and the Zero Trust cookie domain.'
             };
         }
         return { error: 'The reason could not be shown', stamp: 'Unavailable' };
@@ -1236,7 +1236,8 @@
         try {
             loadDenyReason();
 
-            const userDetailsResponse = await fetch('/cf-access/api/userdetails');
+            const userDetailsQuery = originalUrl ? '?original_url=' + encodeURIComponent(originalUrl) : '';
+            const userDetailsResponse = await fetch('/cf-access/api/userdetails' + userDetailsQuery);
 
             if (!userDetailsResponse.ok) {
                 throw new Error(`User details fetch failed: ${userDetailsResponse.status}`);
