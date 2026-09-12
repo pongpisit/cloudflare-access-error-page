@@ -23,6 +23,13 @@
   ],
   "author": "Zero Security Corp",
   "license": "PROPRIETARY",
+  "cloudflare": {
+    "bindings": {
+      "BEARER_TOKEN": {
+        "description": "Create an API token with **Account → Access: Apps and Policies → Read**, **Account → Access: Audit Logs → Read**, **Account → Zero Trust: Devices → Read**, and **Device Posture → Read** permissions. See the README for details."
+      }
+    }
+  },
   "devDependencies": {
     "wrangler": "^4.59.3"
   }

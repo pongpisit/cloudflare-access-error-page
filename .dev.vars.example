@@ -2,9 +2,7 @@
 # Copy this file to .dev.vars and fill in your actual values
 # .dev.vars is gitignored and will never be committed
 
-# For DNS Dashboard (/dns)
-DNS_DASHBOARD_API_TOKEN=your_api_token_here
-DNS_DASHBOARD_ACCOUNT_ID=your_account_id_here
-
-# For CF Access page (/cf-access) - device/posture data
-BEARER_TOKEN=your_bearer_token_here
+# API token used to resolve why the user was denied
+# (Access: Apps and Policies Read, Access: Audit Logs Read,
+#  Zero Trust: Devices Read, Device Posture Read — see README)
+BEARER_TOKEN=your_api_token_here
