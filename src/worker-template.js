@@ -60,6 +60,11 @@ function getAccessJwt(request) {
   if (match) {
     return { jwt: match[1], source: 'cookie' };
   }
+  if (cookieHeader) {
+    console.warn("[session] CF_Authorization missing; other cookies present:", cookieHeader.split(';').map(c => c.trim().split('=')[0]).filter(Boolean).join(','));
+  } else {
+    console.warn("[session] no cookie header at all; page host has no Access session source");
+  }
   return null;
 }
 
