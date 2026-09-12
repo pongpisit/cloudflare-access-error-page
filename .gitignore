@@ -1,6 +1,5 @@
 # Wrangler
 .wrangler/
-wrangler.jsonc
 
 # Auto-generated files (built from src/)
 main.js

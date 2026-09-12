@@ -1,0 +1,30 @@
+{
+  // Cloudflare Worker configuration for the Access error page.
+  // This file is committed so `wrangler deploy` (and the Deploy to
+  // Cloudflare button) work out of the box — `main.js` is generated
+  // by `npm run build` before deploy.
+
+  "name": "cloudflare-access-error-page",
+  "main": "main.js",
+  "compatibility_date": "2024-01-01",
+
+  // Serve on your *.workers.dev subdomain by default.
+  "workers_dev": true,
+
+  // Your Cloudflare Account ID — optional when deploying via the
+  // Deploy to Cloudflare button or `wrangler deploy --account-id=YOUR_ID`:
+  // "account_id": "your-account-id-here",
+
+  // To serve the page on your own domain instead of workers.dev,
+  // uncomment and edit (the pattern must also cover /cf-access/api/*
+  // and /cf-access/scripts/*, hence the trailing *):
+  // "routes": [
+  //   {
+  //     "pattern": "access.example.com/cf-access*",
+  //     "zone_name": "example.com"
+  //   }
+  // ],
+
+  // Secrets (set via the Deploy button prompt or `wrangler secret put`):
+  //   BEARER_TOKEN — API token used to resolve deny reasons (see README)
+}

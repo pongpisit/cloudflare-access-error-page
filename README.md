@@ -56,11 +56,14 @@ Everything degrades gracefully: with no API token (or missing permissions) the p
 
 ### 1. Deploy the Worker
 
+Click the **Deploy to Cloudflare** button at the top of this README, or deploy from the CLI:
+
 ```bash
 npm install
-cp wrangler.example.jsonc wrangler.jsonc   # edit the route pattern for your domain
 npm run deploy
 ```
+
+The committed `wrangler.jsonc` works out of the box: the Worker is served on your `*.workers.dev` subdomain. To serve it on your own domain instead, add a route to `wrangler.jsonc` (an example is included as a comment) or via the dashboard — the pattern must cover `/cf-access*` so the page, its `/api/*` and `/scripts/*` paths are all routed.
 
 ### 2. Create the API token and secret
 
@@ -128,7 +131,7 @@ cloudflare-access-error-page/
 │   ├── worker-template.js         # Worker source (routes + /cf-access/api/*)
 │   └── build.js                   # Bundles pages into main.js
 ├── main.js (auto-generated)
-├── wrangler.example.jsonc
+├── wrangler.jsonc
 └── ARCHITECTURE.md                # Full technical documentation
 ```
 
@@ -136,8 +139,6 @@ cloudflare-access-error-page/
 
 ```bash
 npm install
-cp wrangler.example.jsonc wrangler.jsonc
-# Edit wrangler.jsonc with your route
 
 npm run build    # Build worker
 npm run dev      # Local development
