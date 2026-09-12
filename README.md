@@ -80,6 +80,8 @@ Then set it as a Worker secret:
 wrangler secret put BEARER_TOKEN
 ```
 
+> **No token yet?** You can deploy without it — the page still works, but users get a generic reason (*limited mode*) instead of the exact policy. Add the token afterwards via the dashboard (**Workers & Pages → your worker → Settings → Variables and Secrets**) or with `wrangler secret put BEARER_TOKEN`.
+
 ### 3. Point your Access applications at the page
 
 In each Access application (Zero Trust → Applications → your app):

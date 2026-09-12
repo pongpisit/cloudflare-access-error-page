@@ -26,7 +26,7 @@
   "cloudflare": {
     "bindings": {
       "BEARER_TOKEN": {
-        "description": "Create an API token with **Account → Access: Apps and Policies → Read**, **Account → Access: Audit Logs → Read**, **Account → Zero Trust: Devices → Read**, and **Device Posture → Read** permissions. See the README for details."
+        "description": "**Optional at deploy time** — you can leave this empty and add it later via `wrangler secret put BEARER_TOKEN` (the page will show a generic reason until then). Create a custom token at [dash.cloudflare.com/profile/api-tokens](https://dash.cloudflare.com/profile/api-tokens/create) with **Account → Access: Apps and Policies → Read**, **Account → Access: Audit Logs → Read**, **Account → Zero Trust: Devices → Read**, and **Device Posture → Read**. See the README for details."
       }
     }
   },
