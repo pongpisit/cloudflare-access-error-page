@@ -26,7 +26,9 @@ User sees a plain-language reason, what to do next, and their details
 
 ## What the blocked user sees
 
-**"Why you were denied" card** — the exact reason, one of:
+A single-column incident record, ordered for a person who just lost access — verdict first, next steps second, evidence after:
+
+**Verdict panel** — the exact reason, one of:
 
 | Reason type | Meaning |
 |-------------|---------|
@@ -37,12 +39,14 @@ User sees a plain-language reason, what to do next, and their details
 | `session_issue` | You meet the requirements, but your session was rejected or expired |
 | `limited` | Detailed reason unavailable — the API token is missing permissions; the page still shows everything else |
 
-- **Requirements breakdown** — e.g. *Policy "Engineering-only" requires members of Access group "Engineering" — your groups: Sales, Marketing*
-- **Failing posture checks** — listed with fix hints
+- **Status stamp** — quick-scan verdict (*Blocked by policy*, *Not on the allow list*, *Device failed checks*, …) with the Cloudflare error code
+- **What to do next** — numbered steps written for the person staring at the page
+- **Requirements ledger** — a "Required vs. You" comparison, e.g. *Policy "Engineering-only" requires members of Access group "Engineering" — your groups: Sales, Marketing*
+- **Failing device checks** — listed with fix hints
+- **Your credentials** — You / Device / Posture cards with status pills
 - **Recent failed sign-ins** — the user's failed Access login events from the last 15 minutes (application, identity provider, country, reason)
-- **What to do next** — actionable steps, plus **Contact IT** / **Copy details** buttons prefilled with the full context (reason, error code, application, email, failing checks)
-- **Your details** — identity (name, email, groups, WARP status), device, posture, and raw debug JSON
-- Light/dark themes, keyboard accessible (WCAG 2.1 AA patterns)
+- **Actions** — *Try the app again*, *Email IT*, *Copy details for IT*, prefilled with the full context (reason, error code, application, email, failing checks)
+- Light/dark themes, keyboard accessible (WCAG 2.1 AA patterns), zero external CDN dependencies (all fonts and styles are local)
 
 Everything degrades gracefully: with no API token (or missing permissions) the page still works, showing identity and posture data with generic guidance.
 

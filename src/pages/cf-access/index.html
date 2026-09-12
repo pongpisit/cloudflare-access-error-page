@@ -3,9 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Access Denied - Zero Security Corp</title>
-<meta name="description" content="View your Cloudflare Access and device information.">
-<script src="https://cdn.tailwindcss.com"></script>
+<title>Access denied — Zero Security Corp</title>
+<meta name="description" content="Why Cloudflare Access blocked this request, and what to do next.">
 <style>
     * {
         margin: 0;
@@ -14,674 +13,98 @@
     }
 
     :root {
-        --bg-primary: #ffffff;
-        --bg-secondary: #f9fafb;
-        --bg-tertiary: #f3f4f6;
-        --bg-hover: #e5e7eb;
-        --text-primary: #111827;
-        --text-secondary: #4b5563;
-        --text-tertiary: #6b7280;
-        --border-primary: #e5e7eb;
-        --border-secondary: #f3f4f6;
-        --accent-primary: #2563eb;
-        --accent-hover: #1d4ed8;
-        --accent-info: #3b82f6;
-        --accent-error: #dc2626;
-        --accent-warning: #f59e0b;
-        --accent-success: #10b981;
-        --gradient-color: rgba(220, 38, 38, 0.08);
-        --icon-bg: rgba(37, 99, 235, 0.1);
-        --icon-border: rgba(37, 99, 235, 0.2);
+        --paper: #f4f6f3;
+        --card: #ffffff;
+        --ink: #191d1b;
+        --muted: #5d6660;
+        --faint: #8a938d;
+        --line: #e0e4de;
+        --line-strong: #c9cec7;
+        --amber: #b45309;
+        --amber-ink: #92400e;
+        --red: #b91c1c;
+        --green: #15803d;
+        --stamp-bg: rgba(180, 83, 9, 0.07);
+        --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+        --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Monaco, "Cascadia Mono", "Roboto Mono", monospace;
     }
 
     :root[data-theme="dark"] {
-        --bg-primary: #000000;
-        --bg-secondary: rgba(255, 255, 255, 0.02);
-        --bg-tertiary: rgba(255, 255, 255, 0.03);
-        --bg-hover: rgba(255, 255, 255, 0.1);
-        --text-primary: #ffffff;
-        --text-secondary: #9ca3af;
-        --text-tertiary: #6b7280;
-        --border-primary: rgba(255, 255, 255, 0.06);
-        --border-secondary: rgba(255, 255, 255, 0.04);
-        --accent-primary: #3080ff;
-        --accent-hover: #54a2ff;
-        --accent-info: #90c5ff;
-        --accent-error: #ff6568;
-        --accent-warning: #ffa940;
-        --accent-success: #00d294;
-        --gradient-color: rgba(255, 101, 104, 0.15);
-        --icon-bg: rgba(48, 128, 255, 0.1);
-        --icon-border: rgba(48, 128, 255, 0.3);
-    }
-
-    :root[data-theme="light"] {
-        --bg-primary: #ffffff;
-        --bg-secondary: #f9fafb;
-        --bg-tertiary: #f3f4f6;
-        --bg-hover: #e5e7eb;
-        --text-primary: #111827;
-        --text-secondary: #4b5563;
-        --text-tertiary: #6b7280;
-        --border-primary: #e5e7eb;
-        --border-secondary: #f3f4f6;
-        --accent-primary: #2563eb;
-        --accent-hover: #1d4ed8;
-        --accent-info: #3b82f6;
-        --accent-error: #dc2626;
-        --accent-warning: #f59e0b;
-        --accent-success: #10b981;
-        --gradient-color: rgba(220, 38, 38, 0.08);
-        --icon-bg: rgba(37, 99, 235, 0.1);
-        --icon-border: rgba(37, 99, 235, 0.2);
+        --paper: #0c0e0d;
+        --card: #141715;
+        --ink: #ebedea;
+        --muted: #9ba49f;
+        --faint: #6c756f;
+        --line: #232826;
+        --line-strong: #333933;
+        --amber: #f0b33e;
+        --amber-ink: #f7c566;
+        --red: #f87d7d;
+        --green: #3fd68f;
+        --stamp-bg: rgba(240, 179, 62, 0.09);
     }
 
     @media (prefers-color-scheme: dark) {
         :root:not([data-theme="light"]) {
-            --bg-primary: #000000;
-            --bg-secondary: rgba(255, 255, 255, 0.02);
-            --bg-tertiary: rgba(255, 255, 255, 0.03);
-            --bg-hover: rgba(255, 255, 255, 0.1);
-            --text-primary: #ffffff;
-            --text-secondary: #9ca3af;
-            --text-tertiary: #6b7280;
-            --border-primary: rgba(255, 255, 255, 0.06);
-            --border-secondary: rgba(255, 255, 255, 0.04);
-            --accent-primary: #3080ff;
-            --accent-hover: #54a2ff;
-            --accent-info: #90c5ff;
-            --accent-error: #ff6568;
-            --accent-warning: #ffa940;
-            --accent-success: #00d294;
-            --gradient-color: rgba(255, 101, 104, 0.15);
-            --icon-bg: rgba(48, 128, 255, 0.1);
-            --icon-border: rgba(48, 128, 255, 0.3);
+            --paper: #0c0e0d;
+            --card: #141715;
+            --ink: #ebedea;
+            --muted: #9ba49f;
+            --faint: #6c756f;
+            --line: #232826;
+            --line-strong: #333933;
+            --amber: #f0b33e;
+            --amber-ink: #f7c566;
+            --red: #f87d7d;
+            --green: #3fd68f;
+            --stamp-bg: rgba(240, 179, 62, 0.09);
         }
     }
 
-    @media (prefers-color-scheme: light) {
-        :root:not([data-theme="dark"]) {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f9fafb;
-            --bg-tertiary: #f3f4f6;
-            --bg-hover: #e5e7eb;
-            --text-primary: #111827;
-            --text-secondary: #4b5563;
-            --text-tertiary: #6b7280;
-            --border-primary: #e5e7eb;
-            --border-secondary: #f3f4f6;
-            --accent-primary: #2563eb;
-            --accent-hover: #1d4ed8;
-            --accent-info: #3b82f6;
-            --accent-error: #dc2626;
-            --accent-warning: #f59e0b;
-            --accent-success: #10b981;
-            --gradient-color: rgba(220, 38, 38, 0.05);
-            --icon-bg: rgba(37, 99, 235, 0.1);
-            --icon-border: rgba(37, 99, 235, 0.2);
-        }
+    html {
+        scrollbar-gutter: stable;
     }
 
     body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, 'Noto Sans', 'Ubuntu', sans-serif;
-        line-height: 1.5;
-        color: var(--text-primary);
-        background: var(--bg-primary);
+        font-family: var(--font-body);
+        font-size: 15px;
+        line-height: 1.6;
+        color: var(--ink);
+        background: var(--paper);
         -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        font-weight: 500;
-        overflow-x: hidden;
         min-height: 100vh;
         display: flex;
         flex-direction: column;
     }
 
-    .radial-gradient {
-        position: absolute;
-        top: 0;
-        right: 20px;
-        background: radial-gradient(circle, var(--gradient-color) 1%, transparent 70%);
-        pointer-events: none;
-        z-index: 0;
-        height: 550px;
-        width: 550px;
+    [hidden] {
+        display: none !important;
     }
 
-    @media (min-width: 768px) {
-        .radial-gradient {
-            right: 56px;
-            height: 650px;
-            width: 650px;
-        }
-    }
-
-    @media (min-width: 1024px) {
-        .radial-gradient {
-            height: 850px;
-            width: 850px;
-        }
-    }
-
-    .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 20px;
-        position: relative;
-        z-index: 1;
-    }
-
-    header {
-        padding: 20px 0;
-        border-bottom: 1px solid var(--border-primary);
-    }
-
-    nav {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .logo {
-        font-size: 16px;
-        font-weight: 600;
-        color: var(--text-primary);
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .logo svg {
-        height: 24px;
-        width: auto;
-    }
-
-    .theme-toggle {
-        background: var(--bg-tertiary);
-        border: 1px solid var(--border-primary);
-        border-radius: 8px;
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.2s;
-        padding: 0;
-    }
-
-    .theme-toggle:hover {
-        background: var(--bg-hover);
-        transform: scale(1.05);
-    }
-
-    .theme-toggle svg {
-        width: 20px;
-        height: 20px;
-        color: var(--text-secondary);
-        transition: all 0.2s;
-    }
-
-    .theme-toggle:hover svg {
-        color: var(--text-primary);
-    }
-
-    main {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        padding: 40px 20px;
-    }
-
-    .info-container {
+    .wrap {
         width: 100%;
-        max-width: 1000px;
+        max-width: 880px;
         margin: 0 auto;
+        padding: 0 24px;
     }
 
-    .page-header {
-        text-align: center;
-        margin-bottom: 48px;
-    }
-
-    .page-icon {
-        width: 80px;
-        height: 80px;
-        background: var(--icon-bg);
-        border: 2px solid var(--icon-border);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 24px;
-    }
-
-    .page-icon svg {
-        width: 40px;
-        height: 40px;
-        color: var(--accent-info);
-    }
-
-    .page-header h1 {
-        font-size: 32px;
-        font-weight: 700;
-        color: var(--text-primary);
-        margin-bottom: 12px;
-        letter-spacing: -0.025em;
-    }
-
-    @media (min-width: 768px) {
-        .page-header h1 {
-            font-size: 42px;
-        }
-    }
-
-    .page-header p {
-        font-size: 16px;
-        color: var(--text-secondary);
-        max-width: 600px;
-        margin: 0 auto;
-        line-height: 1.6;
-    }
-
-    .primary-button {
-        background: var(--accent-primary);
-        color: white;
-        padding: 12px 28px;
-        border-radius: 8px;
-        font-size: 15px;
-        font-weight: 600;
-        transition: all 0.15s;
-        display: inline-flex;
-        align-items: center;
-        border: none;
-        cursor: pointer;
-    }
-
-    .primary-button:hover {
-        background: var(--accent-hover);
-        transform: translateY(-1px);
-    }
-
-    .tiles-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 24px;
-        margin-bottom: 24px;
-    }
-
-    @media (min-width: 768px) {
-        .tiles-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-
-    @media (min-width: 1024px) {
-        .tiles-grid {
-            grid-template-columns: repeat(3, 1fr);
-        }
-    }
-
-    .tile {
-        background: var(--bg-secondary);
-        border: 1px solid var(--border-secondary);
-        border-radius: 12px;
-        padding: 24px;
-        transition: all 0.2s;
-    }
-
-    .tile:hover {
-        border-color: var(--border-primary);
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    }
-
-    .tile.error {
-        background: rgba(220, 38, 38, 0.05);
-        border-color: rgba(220, 38, 38, 0.2);
-    }
-
-    .tile.loading {
-        opacity: 0.6;
-    }
-
-    .tile-header {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 20px;
-        padding-bottom: 16px;
-        border-bottom: 1px solid var(--border-secondary);
-    }
-
-    .tile-icon {
-        width: 40px;
-        height: 40px;
-        background: var(--icon-bg);
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-
-    .tile-icon svg {
-        width: 20px;
-        height: 20px;
-        color: var(--accent-info);
-    }
-
-    .tile.error .tile-icon {
-        background: rgba(220, 38, 38, 0.1);
-    }
-
-    .tile.error .tile-icon svg {
-        color: var(--accent-error);
-    }
-
-    .tile-title {
-        font-size: 18px;
-        font-weight: 600;
-        color: var(--text-primary);
-    }
-
-    .tile-content {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .info-item {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-    }
-
-    .info-label {
-        font-size: 11px;
-        font-weight: 600;
-        color: var(--text-secondary);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-    }
-
-    .info-value {
-        font-size: 14px;
-        color: var(--text-primary);
-        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-        word-break: break-all;
-    }
-
-    .info-value.status {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .status-icon {
-        width: 16px;
-        height: 16px;
-        flex-shrink: 0;
-    }
-
-    .status-icon.success {
-        color: var(--accent-success);
-    }
-
-    .status-icon.error {
-        color: var(--accent-error);
-    }
-
-    .error-message {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 12px;
-        background: rgba(220, 38, 38, 0.1);
-        border-radius: 6px;
-        color: var(--accent-error);
-        font-size: 14px;
-    }
-
-    /* Deny reason card */
-    .reason-chip {
-        display: inline-flex;
-        align-items: center;
-        padding: 4px 12px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 600;
-        background: rgba(245, 158, 11, 0.12);
-        color: var(--accent-warning);
-        border: 1px solid rgba(245, 158, 11, 0.35);
-        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-        vertical-align: middle;
-        margin-left: 12px;
-        white-space: nowrap;
-    }
-
-    .reason-headline {
-        font-size: 20px;
-        font-weight: 700;
-        color: var(--text-primary);
-        margin-bottom: 8px;
-        letter-spacing: -0.01em;
-        line-height: 1.4;
-    }
-
-    .reason-details {
-        font-size: 14px;
-        color: var(--text-secondary);
-        line-height: 1.6;
-        margin-bottom: 8px;
-    }
-
-    .req-row {
-        display: flex;
-        gap: 10px;
-        padding: 10px 12px;
-        border: 1px solid var(--border-secondary);
-        border-radius: 8px;
-        background: var(--bg-tertiary);
-        align-items: flex-start;
-        font-size: 13px;
-    }
-
-    .req-row + .req-row {
-        margin-top: 8px;
-    }
-
-    .req-icon {
-        width: 16px;
-        height: 16px;
-        flex-shrink: 0;
-        margin-top: 2px;
-    }
-
-    .req-icon.success { color: var(--accent-success); }
-    .req-icon.fail { color: var(--accent-error); }
-    .req-icon.unknown { color: var(--accent-warning); }
-
-    .req-text { color: var(--text-primary); }
-    .req-policy { color: var(--text-tertiary); font-size: 12px; }
-    .req-user-value { color: var(--text-secondary); font-size: 12px; margin-top: 2px; }
-
-    .section-label {
-        font-size: 11px;
-        font-weight: 600;
-        color: var(--text-secondary);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        margin: 12px 0 8px;
-    }
-
-    .next-steps {
-        margin: 4px 0 0;
-        padding-left: 20px;
-        font-size: 14px;
-        color: var(--text-secondary);
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-    }
-
-    .action-buttons {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-        margin-top: 16px;
-    }
-
-    .secondary-button {
-        background: var(--bg-tertiary);
-        color: var(--text-primary);
-        border: 1px solid var(--border-primary);
-        padding: 12px 28px;
-        border-radius: 8px;
-        font-size: 15px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.15s;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-    }
-
-    .secondary-button:hover {
-        background: var(--bg-hover);
-        transform: translateY(-1px);
-    }
-
-    .logins-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 13px;
-    }
-
-    .logins-table th {
-        text-align: left;
-        padding: 8px 10px;
-        color: var(--text-secondary);
-        font-size: 11px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        border-bottom: 1px solid var(--border-primary);
-    }
-
-    .logins-table td {
-        padding: 8px 10px;
-        color: var(--text-primary);
-        border-bottom: 1px solid var(--border-secondary);
-        word-break: break-word;
-    }
-
-    .logins-table tr:last-child td {
-        border-bottom: none;
-    }
-
-    .status-chip {
-        display: inline-block;
-        padding: 2px 10px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 600;
-        background: rgba(220, 38, 38, 0.1);
-        color: var(--accent-error);
-    }
-
-    /* JSON Syntax Highlighting */
-    .json-key {
-        color: #0066cc;
-        font-weight: 600;
-    }
-
-    .json-string {
-        color: #22863a;
-    }
-
-    .json-number {
-        color: #005cc5;
-    }
-
-    .json-boolean {
-        color: #d73a49;
-        font-weight: 600;
-    }
-
-    .json-null {
-        color: #6f42c1;
-        font-weight: 600;
-    }
-
-    [data-theme="dark"] .json-key {
-        color: #79b8ff;
-    }
-
-    [data-theme="dark"] .json-string {
-        color: #85e89d;
-    }
-
-    [data-theme="dark"] .json-number {
-        color: #79b8ff;
-    }
-
-    [data-theme="dark"] .json-boolean {
-        color: #f97583;
-    }
-
-    [data-theme="dark"] .json-null {
-        color: #b392f0;
-    }
-
-    .loading-spinner {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        border: 3px solid var(--border-primary);
-        border-radius: 50%;
-        border-top-color: var(--accent-primary);
-        animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-        to { transform: rotate(360deg); }
-    }
-
-    footer {
-        padding: 24px 20px;
-        background: var(--bg-primary);
-        border-top: 1px solid var(--border-primary);
-        margin-top: auto;
-    }
-
-    .footer-content {
-        text-align: center;
-        color: var(--text-tertiary);
-        font-size: 14px;
-    }
-
-    /* Focus states — WCAG 2.1 AA */
-    button:focus-visible,
     a:focus-visible,
-    .primary-button:focus-visible,
-    .theme-toggle:focus-visible {
-        outline: 2px solid var(--accent-primary);
+    button:focus-visible,
+    summary:focus-visible {
+        outline: 2px solid var(--amber);
         outline-offset: 2px;
-    }
-
-    a:focus-visible {
         border-radius: 4px;
     }
 
-    /* Skip to content */
     .skip-link {
         position: absolute;
         top: -100%;
         left: 16px;
         z-index: 9999;
         padding: 8px 16px;
-        background: var(--accent-primary);
-        color: white;
+        background: var(--ink);
+        color: var(--paper);
         border-radius: 0 0 6px 6px;
         font-weight: 600;
         font-size: 14px;
@@ -692,180 +115,709 @@
         top: 0;
     }
 
-    .debug-toggle-btn {
+    .bar {
+        border-bottom: 1px solid var(--line);
+        background: var(--card);
+    }
+
+    .bar-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        height: 60px;
+    }
+
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        color: var(--ink);
+        font-weight: 600;
+        font-size: 15px;
+        letter-spacing: -0.01em;
+    }
+
+    .brand svg {
+        height: 18px;
+        width: auto;
+        display: block;
+    }
+
+    .bar-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .docket {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        color: var(--faint);
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .theme-toggle {
+        width: 34px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         background: none;
-        border: none;
-        padding: 0;
+        border: 1px solid var(--line-strong);
+        border-radius: 8px;
+        color: var(--muted);
         cursor: pointer;
+        transition: color 0.15s, border-color 0.15s;
+    }
+
+    .theme-toggle:hover {
+        color: var(--ink);
+        border-color: var(--faint);
+    }
+
+    .theme-toggle svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    main {
+        flex: 1;
+        padding: 56px 24px 64px;
+    }
+
+    .verdict-top {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 28px;
+    }
+
+    .stamp {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--amber-ink);
+        border: 2px solid currentColor;
+        border-radius: 4px;
+        padding: 6px 12px 5px;
+        background: var(--stamp-bg);
+        transform: rotate(-2deg);
+        animation: stamp-in 0.32s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+    }
+
+    .stamp--red {
+        color: var(--red);
+        background: color-mix(in srgb, var(--red) 8%, transparent);
+    }
+
+    .stamp--checking {
+        color: var(--faint);
+        border-style: dashed;
+        animation: none;
+        background: none;
+    }
+
+    @keyframes stamp-in {
+        from {
+            transform: scale(1.7) rotate(-9deg);
+            opacity: 0;
+        }
+        to {
+            transform: scale(1) rotate(-2deg);
+            opacity: 1;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .stamp {
+            animation: none;
+        }
+    }
+
+    .verdict-meta {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--muted);
+        letter-spacing: 0.02em;
+        overflow-wrap: anywhere;
+    }
+
+    .verdict h1 {
+        font-family: var(--font-display);
+        font-size: clamp(30px, 6vw, 46px);
+        font-weight: 600;
+        line-height: 1.12;
+        letter-spacing: -0.01em;
+        margin-bottom: 16px;
+        max-width: 21em;
+    }
+
+    .verdict-details {
+        font-size: 16px;
+        color: var(--muted);
+        max-width: 42em;
+        margin-bottom: 28px;
+    }
+
+    .verdict-hint {
+        margin-top: 8px;
+        margin-bottom: 28px;
+        padding: 14px 16px;
+        border-left: 3px solid var(--amber);
+        background: var(--card);
+        border-radius: 0 8px 8px 0;
+        font-size: 14px;
+        color: var(--muted);
+        max-width: 42em;
+    }
+
+    .verdict-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 40px;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 11px 20px;
+        border-radius: 9px;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        border: 1px solid var(--line-strong);
+        background: var(--card);
+        color: var(--ink);
+        transition: transform 0.12s, border-color 0.12s, opacity 0.12s;
+    }
+
+    .btn:hover {
+        border-color: var(--faint);
+        transform: translateY(-1px);
+    }
+
+    .btn--primary {
+        background: var(--ink);
+        border-color: var(--ink);
+        color: var(--paper);
+    }
+
+    .btn--primary:hover {
+        opacity: 0.88;
+    }
+
+    .panel {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--card);
+        padding: 22px 24px 24px;
+        margin-bottom: 18px;
+    }
+
+    .panel-label {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--faint);
+        margin-bottom: 16px;
+    }
+
+    .steps {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .steps li {
+        display: flex;
+        gap: 14px;
+        align-items: baseline;
+        font-size: 15px;
+    }
+
+    .step-n {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--amber-ink);
+        border: 1px solid var(--line-strong);
+        border-radius: 999px;
+        width: 24px;
+        height: 24px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        transform: translateY(2px);
+    }
+
+    .ledger-head,
+    .req-row {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr 30px;
+        gap: 16px;
+    }
+
+    .ledger-head {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--faint);
+        padding: 0 0 10px;
+        border-bottom: 1px solid var(--line-strong);
+    }
+
+    .req-row {
+        padding: 14px 0;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .req-row:last-child {
+        border-bottom: none;
+        padding-bottom: 4px;
+    }
+
+    .req-text {
+        font-size: 14px;
+        overflow-wrap: anywhere;
+    }
+
+    .policy-tag {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--faint);
+        margin-top: 4px;
+        letter-spacing: 0.03em;
+        overflow-wrap: anywhere;
+    }
+
+    .cell-label {
+        display: none;
+        font-family: var(--font-mono);
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--faint);
+        margin-bottom: 4px;
+    }
+
+    .req-status {
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-end;
+        padding-top: 2px;
+    }
+
+    .req-status svg {
+        width: 17px;
+        height: 17px;
+        flex-shrink: 0;
+    }
+
+    .req-status .is-fail {
+        color: var(--red);
+    }
+
+    .req-status .is-ok {
+        color: var(--green);
+    }
+
+    .check-row {
         display: flex;
         align-items: center;
         gap: 12px;
-        width: 100%;
-        font: inherit;
-        color: inherit;
-        text-align: left;
+        padding: 12px 16px;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        background: var(--paper);
+        font-size: 14px;
     }
 
-    @media (max-width: 768px) {
-        .page-header h1 {
-            font-size: 28px;
+    .check-row + .check-row {
+        margin-top: 10px;
+    }
+
+    .check-row svg {
+        width: 16px;
+        height: 16px;
+        color: var(--red);
+        flex-shrink: 0;
+    }
+
+    .creds {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+        margin-bottom: 18px;
+    }
+
+    .cred {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--card);
+        padding: 20px;
+    }
+
+    .cred-title {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--faint);
+        margin-bottom: 14px;
+    }
+
+    .cred-row {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .cred-row:first-of-type {
+        border-top: 1px solid var(--line);
+    }
+
+    .cred-row:last-of-type {
+        border-bottom: none;
+    }
+
+    .cred-label {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--faint);
+    }
+
+    .cred-value {
+        font-size: 13.5px;
+        font-family: var(--font-mono);
+        overflow-wrap: anywhere;
+    }
+
+    .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        padding: 3px 10px 4px;
+        border-radius: 999px;
+        width: fit-content;
+    }
+
+    .pill--ok {
+        color: var(--green);
+        background: color-mix(in srgb, var(--green) 12%, transparent);
+    }
+
+    .pill--fail {
+        color: var(--red);
+        background: color-mix(in srgb, var(--red) 12%, transparent);
+    }
+
+    .pill--warn {
+        color: var(--amber-ink);
+        background: color-mix(in srgb, var(--amber) 14%, transparent);
+    }
+
+    .pill--muted {
+        color: var(--muted);
+        background: color-mix(in srgb, var(--muted) 12%, transparent);
+    }
+
+    .attempts-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+    }
+
+    .attempts-table th {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--faint);
+        text-align: left;
+        padding: 0 10px 10px;
+        border-bottom: 1px solid var(--line-strong);
+    }
+
+    .attempts-table td {
+        padding: 12px 10px;
+        border-bottom: 1px solid var(--line);
+        vertical-align: top;
+        overflow-wrap: anywhere;
+    }
+
+    .attempts-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .attempts-table td .pill {
+        font-size: 10px;
+    }
+
+    .debug-toggle {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--faint);
+        padding: 0;
+    }
+
+    .debug-toggle:hover {
+        color: var(--muted);
+    }
+
+    .debug-toggle svg {
+        width: 14px;
+        height: 14px;
+        transition: transform 0.2s;
+    }
+
+    .debug-json {
+        margin-top: 16px;
+        padding: 14px 16px;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        background: var(--paper);
+        font-family: var(--font-mono);
+        font-size: 12px;
+        line-height: 1.6;
+        max-height: 420px;
+        overflow: auto;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+    .json-key { color: var(--amber-ink); font-weight: 600; }
+    .json-string { color: var(--green); }
+    .json-number { color: var(--muted); }
+    .json-boolean { color: var(--red); font-weight: 600; }
+    .json-null { color: var(--faint); font-weight: 600; }
+
+    .spinner {
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        border: 2px solid var(--line-strong);
+        border-top-color: var(--amber);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    .loading-state {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 18px 0;
+        color: var(--faint);
+        font-family: var(--font-mono);
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .spinner {
+            animation-duration: 1.6s;
+        }
+    }
+
+    .foot {
+        border-top: 1px solid var(--line);
+        padding: 22px 0 28px;
+    }
+
+    .foot-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        letter-spacing: 0.06em;
+        color: var(--faint);
+    }
+
+    @media (max-width: 760px) {
+        main {
+            padding: 40px 24px 48px;
         }
 
-        .tiles-grid {
+        .creds {
             grid-template-columns: 1fr;
+        }
+
+        .ledger-head {
+            display: none;
+        }
+
+        .req-row {
+            display: block;
+            position: relative;
+            padding-right: 32px;
+        }
+
+        .cell-label {
+            display: block;
+        }
+
+        .req-cell + .req-cell {
+            margin-top: 12px;
+        }
+
+        .req-status {
+            position: absolute;
+            top: 14px;
+            right: 0;
+            padding: 0;
+        }
+
+        .docket {
+            display: none;
         }
     }
 </style>
 </head>
 <body>
 <a href="#main-content" class="skip-link">Skip to main content</a>
-<div class="radial-gradient" aria-hidden="true"></div>
-<header>
-    <nav class="container" aria-label="Primary navigation">
-        <a href="/" class="logo" aria-label="Zero Security Corp home">
-            <svg width="120" height="53" viewBox="0 0 120 53" fill="none" xmlns="http://www.w3.org/2000/svg" style="height: 20px; width: auto;">
+
+<header class="bar">
+    <div class="wrap bar-inner">
+        <a href="/" class="brand" aria-label="Zero Security Corp home">
+            <svg width="120" height="53" viewBox="0 0 120 53" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <path d="M82.4133 49.8717C83.1507 47.4123 82.8698 45.1578 81.6408 43.484C80.5171 41.9469 78.621 41.0588 76.3385 40.9563L33.1128 40.4097C32.8319 40.4097 32.5861 40.2731 32.4456 40.0682C32.3052 39.8632 32.2701 39.5899 32.3403 39.3167C32.4808 38.9068 32.9021 38.5993 33.3586 38.5652L76.9706 38.0186C82.1324 37.7795 87.7507 33.7146 89.7171 28.7275L92.2102 22.4081C92.3156 22.1348 92.3507 21.8616 92.2804 21.5883C89.4713 9.22285 78.1294 0 64.5752 0C52.0745 0 41.47 7.8565 37.6777 18.7531C35.2197 16.9769 32.0945 16.0204 28.7235 16.3279C22.719 16.9086 17.9083 21.5883 17.3114 27.4294C17.1709 28.9324 17.2762 30.4012 17.6274 31.7676C7.83049 32.0409 0 39.8291 0 49.4277C0 50.2816 0.0702286 51.1356 0.175572 51.9896C0.2458 52.3995 0.596941 52.7069 1.01831 52.7069H80.7981C81.2545 52.7069 81.6759 52.3995 81.8164 51.9554L82.4133 49.8717Z" fill="#F38020"/>
                 <path d="M96.1781 22.8521C95.7918 22.8521 95.3704 22.852 94.9842 22.8862C94.7033 22.8862 94.4575 23.0912 94.3521 23.3644L92.6667 29.0689C91.9293 31.5284 92.2102 33.7828 93.4392 35.4566C94.5628 36.9938 96.459 37.8819 98.7414 37.9844L107.941 38.5309C108.222 38.5309 108.468 38.6675 108.609 38.8725C108.749 39.0774 108.784 39.3849 108.714 39.624C108.573 40.0339 108.152 40.3413 107.696 40.3755L98.1094 40.922C92.9125 41.1611 87.3293 45.226 85.3629 50.2132L84.6606 51.9553C84.5201 52.2969 84.7659 52.6384 85.1522 52.6384H118.089C118.476 52.6384 118.827 52.3993 118.932 52.0236C119.494 50.0424 119.81 47.9587 119.81 45.8067C119.81 33.168 109.205 22.8521 96.1781 22.8521Z" fill="#FAAE40"/>
             </svg>
             <span>Zero Security Corp</span>
         </a>
-        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle color theme">
-            <svg id="theme-icon-sun" style="display: none;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-            <svg id="theme-icon-moon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-            </svg>
-        </button>
-    </nav>
-</header>
-
-<main id="main-content">
-    <div class="container">
-        <div class="info-container">
-            <div class="page-header">
-                <div class="page-icon" style="background: rgba(220, 38, 38, 0.1); border-color: rgba(220, 38, 38, 0.2);">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: #dc2626;">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                </div>
-                <h1 class="text-heading-24 mt-8 mb-4">Access Denied</h1>
-                <p class="text-sm text-gray-900 m-0">Your access attempt has been logged. Review your authentication details and device posture status below. If you believe this is an error, contact IT support.</p>
-                <button onclick="reloadApplication()" class="inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-white hover:opacity-80 focus-visible:ring-red-500" style="margin-top: 20px; --geist-icon-size:16px; background-color: rgba(220, 38, 38, 0.85);" aria-label="Reload the access application">
-                    <svg style="width: 16px; height: 16px; margin-right: 8px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                    <span>Reload Access Application</span>
-                </button>
-            </div>
-
-            <div class="tiles-grid">
-                <div class="tile loading" id="reason-tile" style="grid-column: 1 / -1;">
-                    <div class="tile-header">
-                        <div class="tile-icon" style="background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.2);">
-                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: #f59e0b;" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.546-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <h2 class="text-heading-16 font-medium m-0 w-max whitespace-nowrap overflow-hidden text-ellipsis flex-1 mr-0">Why you were denied</h2>
-                    </div>
-                    <div class="tile-content" id="reason-content">
-                        <div style="text-align: center; padding: 20px;" role="status" aria-label="Loading deny reason">
-                            <div class="loading-spinner"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="tile loading" id="warp-tile">
-                    <div class="tile-header">
-                        <div class="tile-icon" style="background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.2);">
-                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: #10b981;">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                            </svg>
-                        </div>
-                        <h2 class="text-heading-16 font-medium m-0 w-max whitespace-nowrap overflow-hidden text-ellipsis flex-1 mr-0">User Information</h2>
-                    </div>
-                    <div class="tile-content" id="warp-content">
-                        <div style="text-align: center; padding: 20px;" role="status" aria-label="Loading user information">
-                            <div class="loading-spinner"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="tile loading" id="device-tile">
-                    <div class="tile-header">
-                        <div class="tile-icon" style="background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.2);">
-                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: #3b82f6;" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                            </svg>
-                        </div>
-                        <h2 class="text-heading-16 font-medium m-0 w-max whitespace-nowrap overflow-hidden text-ellipsis flex-1 mr-0">Device Information</h2>
-                    </div>
-                    <div class="tile-content" id="device-content">
-                        <div style="text-align: center; padding: 20px;" role="status" aria-label="Loading device information">
-                            <div class="loading-spinner"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="tile loading" id="posture-tile">
-                    <div class="tile-header">
-                        <div class="tile-icon" style="background: rgba(168, 85, 247, 0.1); border-color: rgba(168, 85, 247, 0.2);">
-                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: #a855f7;" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                            </svg>
-                        </div>
-                        <h2 class="text-heading-16 font-medium m-0 w-max whitespace-nowrap overflow-hidden text-ellipsis flex-1 mr-0">Device Posture</h2>
-                    </div>
-                    <div class="tile-content" id="posture-content">
-                        <div style="text-align: center; padding: 20px;" role="status" aria-label="Loading device posture">
-                            <div class="loading-spinner"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Failed sign-ins section - Full Width -->
-            <div class="tile" id="logins-tile" style="margin-top: 20px; display: none;">
-                <div class="tile-header">
-                    <div class="tile-icon" style="background: rgba(220, 38, 38, 0.1); border-color: rgba(220, 38, 38, 0.2);">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: #dc2626;" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </div>
-                    <h2 class="text-heading-16 font-medium m-0 w-max whitespace-nowrap overflow-hidden text-ellipsis flex-1 mr-0">Recent failed sign-ins (last 15 minutes)</h2>
-                </div>
-                <div class="tile-content" id="logins-content"></div>
-            </div>
-
-            <!-- Debug Section - Full Width -->
-            <div class="tile" id="debug-tile" style="margin-top: 20px; grid-column: 1 / -1;">
-                <div class="tile-header" style="padding-bottom: 0; border-bottom: none; margin-bottom: 0;">
-                    <button class="debug-toggle-btn" onclick="toggleDebug()" aria-expanded="false" aria-controls="debug-content" id="debug-toggle-btn">
-                        <div class="tile-icon">
-                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                            </svg>
-                        </div>
-                        <span class="text-heading-16 font-medium">Debug Information</span>
-                        <svg id="debug-toggle" style="margin-left: auto; width: 20px; height: 20px; transition: transform 0.2s;" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </button>
-                </div>
-                <div class="tile-content" id="debug-content" role="region" aria-labelledby="debug-toggle-btn" style="display: none;">
-                    <pre id="debug-json" style="background: var(--bg-secondary); padding: 15px; border-radius: 8px; overflow: auto; font-size: 13px; line-height: 1.6; max-height: 600px; font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace; margin: 0; white-space: pre-wrap; word-wrap: break-word;"></pre>
-                </div>
-            </div>
+        <div class="bar-right">
+            <span class="docket" id="docket"></span>
+            <button class="theme-toggle" id="theme-toggle" aria-label="Toggle color theme">
+                <svg id="theme-icon-sun" style="display:none;" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                </svg>
+                <svg id="theme-icon-moon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                </svg>
+            </button>
         </div>
     </div>
+</header>
+
+<main id="main-content" class="wrap">
+    <section class="verdict" aria-labelledby="verdict-heading">
+        <div class="verdict-top">
+            <span class="stamp stamp--checking" id="verdict-stamp" aria-hidden="true">Checking</span>
+            <span class="verdict-meta" id="verdict-meta"></span>
+        </div>
+        <h1 id="verdict-heading">Access denied</h1>
+        <p class="verdict-details" id="verdict-details">Checking why this request was blocked…</p>
+        <div id="verdict-hint-slot"></div>
+        <div class="verdict-actions">
+            <button onclick="reloadApplication()" class="btn btn--primary" id="btn-retry">Try the app again</button>
+            <a href="#" class="btn" id="btn-mailto">Email IT</a>
+            <button onclick="copySupportDetails()" class="btn" id="btn-copy">Copy details for IT</button>
+        </div>
+    </section>
+
+    <section class="panel" id="next-steps-section" aria-labelledby="next-steps-label" hidden>
+        <h2 class="panel-label" id="next-steps-label">What to do next</h2>
+        <ol class="steps" id="next-steps"></ol>
+    </section>
+
+    <section class="panel" id="requirements-section" aria-labelledby="requirements-label" hidden>
+        <h2 class="panel-label" id="requirements-label">What this app requires vs. what you have</h2>
+        <div id="requirements"></div>
+    </section>
+
+    <section class="panel" id="posture-section" aria-labelledby="posture-label" hidden>
+        <h2 class="panel-label" id="posture-label">Failing device checks</h2>
+        <div id="posture-fails"></div>
+    </section>
+
+    <section class="creds" aria-label="Your credentials">
+        <div class="cred">
+            <h2 class="cred-title">You</h2>
+            <div class="loading-state" id="you-content" role="status" aria-label="Loading your details">
+                <span class="spinner"></span>
+            </div>
+        </div>
+        <div class="cred">
+            <h2 class="cred-title">Device</h2>
+            <div class="loading-state" id="device-content" role="status" aria-label="Loading device details">
+                <span class="spinner"></span>
+            </div>
+        </div>
+        <div class="cred">
+            <h2 class="cred-title">Posture</h2>
+            <div class="loading-state" id="posture-content" role="status" aria-label="Loading device posture">
+                <span class="spinner"></span>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel" id="attempts-section" aria-labelledby="attempts-label" hidden>
+        <h2 class="panel-label" id="attempts-label">Recent failed sign-ins (last 15 minutes)</h2>
+        <div id="attempts"></div>
+    </section>
+
+    <section class="panel" aria-label="Technical details">
+        <button class="debug-toggle" onclick="toggleDebug()" aria-expanded="false" aria-controls="debug-json" id="debug-toggle-btn">
+            <span>Technical details</span>
+            <svg id="debug-toggle" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+        </button>
+        <div class="debug-json" id="debug-json" hidden></div>
+    </section>
 </main>
 
-<footer>
-    <div class="container">
-        <div class="footer-content">
-            <p>&copy; 2026 Zero Security Corp. Protected by Cloudflare Access</p>
-        </div>
+<footer class="foot">
+    <div class="wrap foot-inner">
+        <span>© 2026 Zero Security Corp</span>
+        <span>Protected by Cloudflare Access</span>
     </div>
 </footer>
 
@@ -878,66 +830,80 @@
     const pageUrlParams = new URLSearchParams(window.location.search);
     const originalUrl = pageUrlParams.get('original_url');
 
+    const STAMPS = {
+        blocked_by_deny_policy: { text: 'Blocked by policy', red: true },
+        no_allow_policy_matched: { text: 'Not on the allow list' },
+        requirement_not_met: { text: 'Requirement not met' },
+        posture_check_failed: { text: 'Device failed checks' },
+        session_issue: { text: 'Session rejected' },
+        limited: { text: 'Denied' }
+    };
+
+    document.getElementById('docket').textContent =
+        'Incident ' + new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
+
+    setVerdictMeta(originalUrl);
+
+    function setVerdictMeta(requestedUrl) {
+        const meta = document.getElementById('verdict-meta');
+        let host = 'unknown application';
+        if (requestedUrl) {
+            try {
+                host = new URL(requestedUrl.includes('://') ? requestedUrl : 'https://' + requestedUrl).host;
+            } catch (error) {
+                host = requestedUrl;
+            }
+        }
+        meta.textContent = requestedUrl ? 'Requested ' + host : 'Requested application unknown';
+    }
+
     const themeToggle = document.getElementById('theme-toggle');
     const sunIcon = document.getElementById('theme-icon-sun');
     const moonIcon = document.getElementById('theme-icon-moon');
     const html = document.documentElement;
 
     const savedTheme = localStorage.getItem('theme');
-    
+
     if (savedTheme) {
         html.setAttribute('data-theme', savedTheme);
-    } else {
-        html.setAttribute('data-theme', 'light');
+    }
+
+    function currentTheme() {
+        return html.getAttribute('data-theme')
+            || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     }
 
     function updateThemeIcon() {
-        const currentTheme = html.getAttribute('data-theme');
-        if (currentTheme === 'light') {
-            sunIcon.style.display = 'block';
-            moonIcon.style.display = 'none';
-        } else {
-            sunIcon.style.display = 'none';
-            moonIcon.style.display = 'block';
-        }
+        const isDark = currentTheme() === 'dark';
+        sunIcon.style.display = isDark ? 'block' : 'none';
+        moonIcon.style.display = isDark ? 'none' : 'block';
     }
 
     updateThemeIcon();
 
     themeToggle.addEventListener('click', () => {
-        const currentTheme = html.getAttribute('data-theme');
-        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-        
+        const newTheme = currentTheme() === 'light' ? 'dark' : 'light';
         html.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
         updateThemeIcon();
     });
 
     function toggleDebug() {
-        const content = document.getElementById('debug-content');
+        const content = document.getElementById('debug-json');
         const toggle = document.getElementById('debug-toggle');
         const toggleBtn = document.getElementById('debug-toggle-btn');
-        const isHidden = content.style.display === 'none';
-        content.style.display = isHidden ? 'block' : 'none';
+        const isHidden = content.hidden;
+        content.hidden = !isHidden;
         toggle.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
         toggleBtn.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
     }
 
     function reloadApplication() {
-        // Get original URL from query parameter
-        const urlParams = new URLSearchParams(window.location.search);
-        const originalUrl = urlParams.get('original_url');
-        
         if (originalUrl) {
-            // Decode the URL in case it's URL-encoded
             let decodedUrl = decodeURIComponent(originalUrl);
-            
-            // Ensure the URL has a protocol to prevent relative URL interpretation
             if (!decodedUrl.startsWith('http://') && !decodedUrl.startsWith('https://')) {
                 decodedUrl = 'https://' + decodedUrl;
             }
-            
-            // Use location.replace to navigate to the original URL
             window.location.replace(decodedUrl);
         } else {
             window.location.reload();
@@ -948,28 +914,45 @@
         return String(value == null ? '' : value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     }
 
+    const svgCheck = '<svg class="is-ok" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>';
+    const svgCross = '<svg class="is-fail" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>';
+
     function nextStepsFor(data) {
         const type = data && data.reason ? data.reason.type : 'limited';
-        const steps = [];
-        if (type === 'no_allow_policy_matched') {
-            steps.push('Check that you are signed in with the correct account (your email is listed below).');
-            steps.push('Ask your IT team to add your account, or one of your Access groups, to an Allow policy for this application.');
-        } else if (type === 'blocked_by_deny_policy') {
-            steps.push('A Block policy specifically denies your account or network — contact IT with the details below.');
-            steps.push('If you were on a different network or VPN, try again from your usual work network.');
-        } else if (type === 'requirement_not_met') {
-            steps.push('Complete the additional requirements listed above (for example MFA or a client certificate), then sign in again.');
-        } else if (type === 'posture_check_failed') {
-            steps.push('Turn on the Cloudflare One client (WARP) on this device.');
-            steps.push('Make your device pass the failing checks listed above (CrowdStrike running, OS up to date, disk encryption), then try again.');
-        } else if (type === 'session_issue') {
-            steps.push('Use the Reload Access Application button above to sign in again.');
-            steps.push('If it keeps failing, clear cookies for this site and sign in again.');
-        } else {
-            steps.push('Review your account, device, and posture details below and contact IT if anything looks wrong.');
+        switch (type) {
+            case 'no_allow_policy_matched':
+                return [
+                    'Check the account you signed in with — your email is shown in the You card below.',
+                    'If it is the wrong one, go back to the app and sign in with your work account.',
+                    'If it is correct, ask IT to add you, or one of your groups, to an Allow policy for this app.'
+                ];
+            case 'blocked_by_deny_policy':
+                return [
+                    'A Block policy stops your account or network from reaching this app on purpose.',
+                    'If you are on a VPN, guest, or home network, switch to your usual work network and try again.',
+                    'Otherwise, contact IT with the details below to request an exception.'
+                ];
+            case 'requirement_not_met':
+                return [
+                    'Complete the extra requirement listed above — usually MFA or a client certificate.',
+                    'Return to the app and sign in again.'
+                ];
+            case 'posture_check_failed':
+                return [
+                    'Turn on the Cloudflare One client (WARP) on this device.',
+                    'Fix the failing checks listed above — start CrowdStrike, update your OS, or turn on disk encryption.',
+                    'This page updates as soon as your device reports a passing check.'
+                ];
+            case 'session_issue':
+                return [
+                    'Go back to the app and sign in again — your session had expired.',
+                    'If it keeps failing, clear the site\u2019s cookies and sign in once more.'
+                ];
+            default:
+                return [
+                    'Review your credentials and device checks below and contact IT if anything looks wrong.'
+                ];
         }
-        steps.push('Contact IT support using the button below so they can look up your request.');
-        return steps;
     }
 
     function supportSummaryText(data) {
@@ -978,6 +961,9 @@
         if (data.reason) {
             lines.push('Reason: ' + data.reason.type + (data.reason.errorCode ? ' (error ' + data.reason.errorCode + ': ' + (accessErrorText(data.reason.errorCode) || '') + ')' : ''));
             lines.push('Details: ' + data.reason.details);
+        }
+        if (data.error) {
+            lines.push('Page error: ' + data.error);
         }
         if (data.requestedUrl) lines.push('Application URL: ' + data.requestedUrl);
         if (data.app && data.app.name) lines.push('Application: ' + data.app.name);
@@ -999,93 +985,119 @@
         }
     }
 
+    function setStamp(stampDef) {
+        const stamp = document.getElementById('verdict-stamp');
+        stamp.textContent = stampDef.text;
+        stamp.classList.remove('stamp--checking', 'stamp--red');
+        if (stampDef.red) stamp.classList.add('stamp--red');
+    }
+
+    function setMailto(data) {
+        const appName = data.app && data.app.name ? data.app.name : (data.requestedUrl || 'Cloudflare Access application');
+        document.getElementById('btn-mailto').href = 'mailto:' + IT_SUPPORT_EMAIL +
+            '?subject=' + encodeURIComponent('Access denied: ' + appName) +
+            '&body=' + encodeURIComponent(supportSummaryText(data));
+    }
+
     function renderReasonInfo(data) {
-        const tile = document.getElementById('reason-tile');
-        const content = document.getElementById('reason-content');
-        tile.classList.remove('loading');
+        setMailto(data);
 
         if (!data || data.error) {
-            tile.classList.add('error');
-            const hintText = data && data.hint
-                ? `<div class="reason-details" style="margin-top: 8px;">${esc(data.hint)}</div>`
-                : '';
-            content.innerHTML = `
-                <div class="error-message">
-                    <svg class="status-icon error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                    <span>${esc(data && data.error ? data.error : 'Failed to load deny reason')}</span>
-                </div>
-                ${hintText}
-            `;
+            setStamp({ text: data && data.stamp ? data.stamp : 'Unavailable', red: false });
+            document.getElementById('verdict-heading').textContent = (data && data.error) || 'The reason could not be shown';
+            document.getElementById('verdict-details').textContent = 'Something went wrong while working out why this request was blocked.';
+            const slot = document.getElementById('verdict-hint-slot');
+            if (data && data.hint) {
+                slot.innerHTML = '<p class="verdict-hint">' + esc(data.hint) + '</p>';
+            }
+            document.getElementById('next-steps-section').hidden = true;
+            document.getElementById('requirements-section').hidden = true;
+            document.getElementById('posture-section').hidden = true;
             return;
         }
 
         const reason = data.reason || {};
+        setStamp(STAMPS[reason.type] || { text: 'Denied' });
+
         const errorText = typeof accessErrorText === 'function' ? accessErrorText(reason.errorCode) : null;
+        setVerdictMeta(data.requestedUrl || originalUrl);
+
+        const heading = document.getElementById('verdict-heading');
+        heading.textContent = reason.headline || 'Access denied';
         const chip = reason.errorCode
-            ? `<span class="reason-chip">${esc('Error ' + reason.errorCode + (errorText ? ' — ' + errorText : ''))}</span>`
+            ? ' <span style="font-family:var(--font-mono);font-size:12px;font-weight:400;letter-spacing:0.02em;color:var(--faint);white-space:nowrap;">error ' + esc(String(reason.errorCode)) + (errorText ? ' — ' + esc(errorText) : '') + '</span>'
             : '';
+        heading.insertAdjacentHTML('beforeend', chip);
 
-        const requirementsHtml = Array.isArray(data.requirements) && data.requirements.length ? `
-            <div class="section-label">What this application requires vs. what you have</div>
-            ${data.requirements.map(r => `
+        document.getElementById('verdict-details').textContent = reason.details || '';
+        document.getElementById('verdict-hint-slot').innerHTML = '';
+
+        const steps = nextStepsFor(data);
+        document.getElementById('next-steps').innerHTML = steps.map((s, i) =>
+            '<li><span class="step-n">' + (i + 1) + '</span><span>' + esc(s) + '</span></li>'
+        ).join('');
+        document.getElementById('next-steps-section').hidden = steps.length === 0;
+
+        if (Array.isArray(data.requirements) && data.requirements.length) {
+            const rows = data.requirements.map(r => `
                 <div class="req-row">
-                    <svg class="req-icon ${r.satisfied === true ? 'success' : 'fail'}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        ${r.satisfied === true
-                            ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />'
-                            : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />'}
-                    </svg>
-                    <div>
+                    <div class="req-cell">
+                        <span class="cell-label">Required</span>
                         <div class="req-text">${esc(r.description)}</div>
-                        ${r.userValue ? `<div class="req-user-value">${esc(r.userValue)}</div>` : ''}
-                        ${r.policyName ? `<div class="req-policy">Policy: ${esc(r.policyName)}${r.kind === 'require' ? ' (additional requirement)' : ''}</div>` : ''}
+                        ${r.policyName ? `<div class="policy-tag">policy &ldquo;${esc(r.policyName)}&rdquo;${r.kind === 'require' ? ' &middot; extra requirement' : r.kind === 'exclude' ? ' &middot; exclusion rule' : ''}</div>` : ''}
                     </div>
-                </div>`).join('')}
-        ` : '';
+                    <div class="req-cell">
+                        <span class="cell-label">You</span>
+                        <div class="req-text">${esc(r.userValue || '—')}</div>
+                    </div>
+                    <div class="req-status">${r.satisfied === true ? svgCheck : svgCross}</div>
+                </div>`).join('');
+            document.getElementById('requirements').innerHTML =
+                '<div class="ledger-head"><span>Required</span><span>You</span><span></span></div>' + rows;
+            document.getElementById('requirements-section').hidden = false;
+        } else {
+            document.getElementById('requirements-section').hidden = true;
+        }
 
-        const postureHtml = Array.isArray(data.failingPostureChecks) && data.failingPostureChecks.length ? `
-            <div class="section-label">Failing device posture checks</div>
-            ${data.failingPostureChecks.map(c => `
-                <div class="req-row">
-                    <svg class="req-icon fail" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                    <div class="req-text">${esc(c.name)}</div>
-                </div>`).join('')}
-        ` : '';
+        if (Array.isArray(data.failingPostureChecks) && data.failingPostureChecks.length) {
+            document.getElementById('posture-fails').innerHTML = data.failingPostureChecks.map(c =>
+                '<div class="check-row">' + svgCross + '<span>' + esc(c.name) + '</span></div>'
+            ).join('');
+            document.getElementById('posture-section').hidden = false;
+        } else {
+            document.getElementById('posture-section').hidden = true;
+        }
+    }
 
-        const stepsHtml = nextStepsFor(data).map(s => `<li>${esc(s)}</li>`).join('');
-        const appName = data.app && data.app.name ? data.app.name : (data.requestedUrl || 'Cloudflare Access application');
-        const mailto = 'mailto:' + IT_SUPPORT_EMAIL +
-            '?subject=' + encodeURIComponent('Access denied: ' + appName) +
-            '&body=' + encodeURIComponent(supportSummaryText(data));
-
-        content.innerHTML = `
-            <div class="reason-headline">${esc(reason.headline || 'Access denied')}${chip}</div>
-            <div class="reason-details">${esc(reason.details || '')}</div>
-            ${requirementsHtml}
-            ${postureHtml}
-            <ol class="next-steps">${stepsHtml}</ol>
-            <div class="action-buttons">
-                <button onclick="reloadApplication()" class="primary-button">Try again</button>
-                <a href="${esc(mailto)}" class="secondary-button">Contact IT</a>
-                <button onclick="copySupportDetails()" class="secondary-button">Copy details for IT</button>
-            </div>
-        `;
+    function denyErrorData(error) {
+        if (error && (error.status === 401 || error.code === 'missing_access_jwt')) {
+            return {
+                error: 'No Cloudflare Access session on this page',
+                stamp: 'No session',
+                hint: 'Your identity could not be verified because this page is not being served behind Cloudflare Access. The deny reason only works when the page is deployed on a domain protected by Access in the same Zero Trust organization as the application you were blocked from (for example https://access.example.com/cf-access/). If you are seeing this on a *.workers.dev URL, that is the cause — bind the Worker to your Access-protected domain and point the Access block-page redirects there.'
+            };
+        }
+        if (error && (error.status === 500 || error.code === 'identity_unavailable')) {
+            return {
+                error: 'Access session could not be resolved',
+                stamp: 'Unavailable',
+                hint: 'The worker could not read your identity. This happens when the page is not deployed on an Access-protected custom domain — /cdn-cgi/access/get-identity does not exist on *.workers.dev. If you are the administrator, bind the Worker to your domain behind Access and open the page from there.'
+            };
+        }
+        return { error: 'The reason could not be shown', stamp: 'Unavailable' };
     }
 
     function renderFailedLogins(data) {
-        const tile = document.getElementById('logins-tile');
-        const content = document.getElementById('logins-content');
+        const section = document.getElementById('attempts-section');
         if (!data || data.error || !data.capabilities || !data.capabilities.loginHistory || !Array.isArray(data.failedLogins) || data.failedLogins.length === 0) {
-            tile.style.display = 'none';
+            section.hidden = true;
             return;
         }
 
         const rows = data.failedLogins.map(l => {
             const when = l.datetime ? new Date(l.datetime).toLocaleString() : 'Unknown';
             let reasonLabel = 'Blocked by policy';
+            let pillClass = 'pill--fail';
             if (l.gatewayEnabled === false) reasonLabel = 'Gateway not enabled';
             else if (l.warpEnabled === false) reasonLabel = 'WARP not enabled';
             return `
@@ -1094,12 +1106,12 @@
                     <td>${esc(l.applicationName || 'Unknown application')}</td>
                     <td>${esc(l.identityProvider || 'Unknown')}</td>
                     <td>${esc(l.country || 'Unknown')}</td>
-                    <td><span class="status-chip">${esc(reasonLabel)}</span></td>
+                    <td><span class="pill ${pillClass}">${esc(reasonLabel)}</span></td>
                 </tr>`;
         }).join('');
 
-        content.innerHTML = `
-            <table class="logins-table">
+        document.getElementById('attempts').innerHTML = `
+            <table class="attempts-table">
                 <thead>
                     <tr>
                         <th scope="col">When</th>
@@ -1112,148 +1124,59 @@
                 <tbody>${rows}</tbody>
             </table>
         `;
-        tile.style.display = 'block';
+        section.hidden = false;
+    }
+
+    function credRow(label, value) {
+        return '<div class="cred-row"><span class="cred-label">' + esc(label) + '</span><span class="cred-value">' + esc(value) + '</span></div>';
+    }
+
+    function credPill(label, okText, failText, isOk, warnIfFail) {
+        const cls = isOk ? 'pill--ok' : (warnIfFail ? 'pill--warn' : 'pill--fail');
+        return '<div class="cred-row"><span class="cred-label">' + esc(label) + '</span><span class="pill ' + cls + '">' + (isOk ? esc(okText) : esc(failText)) + '</span></div>';
+    }
+
+    function credError(targetId) {
+        document.getElementById(targetId).innerHTML =
+            '<div class="cred-row"><span class="cred-label">Status</span><span class="pill pill--muted">Unavailable</span></div>';
     }
 
     function renderWarpInfo(data) {
-        const tile = document.getElementById('warp-tile');
-        const content = document.getElementById('warp-content');
-        
-        tile.classList.remove('loading');
-        
+        const target = document.getElementById('you-content');
         if (data.error) {
-            tile.classList.add('error');
-            content.innerHTML = `
-                <div class="error-message">
-                    <svg class="status-icon error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                    <span>${data.error}</span>
-                </div>
-            `;
+            credError('you-content');
             return;
         }
-
-        const userGroups = Array.isArray(data.userGroups) ? data.userGroups.join(', ') : (data.userGroups || 'None');
-        const warpStatus = data.isWarpEnabled ? 'Enabled' : 'Disabled';
-        const warpIcon = data.isWarpEnabled ? 
-            '<svg class="status-icon success" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>' :
-            '<svg class="status-icon error" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>';
-
-        content.innerHTML = `
-            <div class="info-item">
-                <div class="info-label">Full Name</div>
-                <div class="info-value">${data.userName || 'N/A'}</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Email</div>
-                <div class="info-value">${data.userEmail || 'N/A'}</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">WARP Status</div>
-                <div class="info-value status">
-                    ${warpIcon}
-                    <span>${warpStatus}</span>
-                </div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">User Groups</div>
-                <div class="info-value">${userGroups}</div>
-            </div>
-        `;
+        const groups = Array.isArray(data.userGroups) && data.userGroups.length ? data.userGroups.join(', ') : 'None';
+        target.innerHTML =
+            credRow('Name', data.userName || '—') +
+            credRow('Email', data.userEmail || '—') +
+            credRow('Groups', groups) +
+            credPill('Cloudflare One client', 'Connected', 'Not connected', data.isWarpEnabled, true);
     }
 
     function renderDeviceInfo(data) {
-        const tile = document.getElementById('device-tile');
-        const content = document.getElementById('device-content');
-        
-        tile.classList.remove('loading');
-        
         if (data.error) {
-            tile.classList.add('error');
-            content.innerHTML = `
-                <div class="error-message">
-                    <svg class="status-icon error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                    <span>${data.error}</span>
-                </div>
-            `;
+            credError('device-content');
             return;
         }
-
-        content.innerHTML = `
-            <div class="info-item">
-                <div class="info-label">Device ID</div>
-                <div class="info-value">${data.deviceId || 'N/A'}</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Device Name</div>
-                <div class="info-value">${data.deviceName || 'N/A'}</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Model</div>
-                <div class="info-value">${data.deviceModel || 'N/A'}</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">OS Version</div>
-                <div class="info-value">${data.deviceOsVersion || 'N/A'}</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Serial Number</div>
-                <div class="info-value">${data.deviceSerial || 'N/A'}</div>
-            </div>
-        `;
+        document.getElementById('device-content').innerHTML =
+            credRow('Device', data.deviceName || '—') +
+            credRow('Model', data.deviceModel || '—') +
+            credRow('OS version', data.deviceOsVersion || '—') +
+            credRow('Serial number', data.deviceSerial || '—');
     }
 
     function renderPostureInfo(data) {
-        const tile = document.getElementById('posture-tile');
-        const content = document.getElementById('posture-content');
-        
-        tile.classList.remove('loading');
-        
         if (data.error) {
-            tile.classList.add('error');
-            content.innerHTML = `
-                <div class="error-message">
-                    <svg class="status-icon error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                    <span>${data.error}</span>
-                </div>
-            `;
+            credError('posture-content');
             return;
         }
-
-        const crowdstrikeStatus = data.crowdstrikeEnabled ? 'Running' : 'Not Detected';
-        const crowdstrikeIcon = data.crowdstrikeEnabled ? 
-            '<svg class="status-icon success" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>' :
-            '<svg class="status-icon error" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>';
-        
-        const osUpdateStatus = data.osUpToDate ? 'Up to Date' : 'Update Required';
-        const osUpdateIcon = data.osUpToDate ? 
-            '<svg class="status-icon success" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>' :
-            '<svg class="status-icon warning" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>';
-
-        content.innerHTML = `
-            <div class="info-item">
-                <div class="info-label">Crowdstrike Status</div>
-                <div class="info-value status">
-                    ${crowdstrikeIcon}
-                    <span>${crowdstrikeStatus}</span>
-                </div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">OS Update Status</div>
-                <div class="info-value status">
-                    ${osUpdateIcon}
-                    <span>${osUpdateStatus}</span>
-                </div>
-            </div>
-        `;
+        document.getElementById('posture-content').innerHTML =
+            credPill('CrowdStrike', 'Running', 'Not detected', data.crowdstrikeEnabled, false) +
+            credPill('OS updates', 'Up to date', 'Update required', data.osUpToDate, true);
     }
 
-    // Function to syntax highlight JSON for better readability
     function syntaxHighlightJSON(obj) {
         const json = JSON.stringify(obj, null, 2);
         return json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -1274,7 +1197,6 @@
             });
     }
 
-    // Function to extract device_id from JWT token
     function getDeviceIdFromToken(jwt) {
         const [header, payload, signature] = jwt.split(".");
         if (payload) {
@@ -1297,47 +1219,29 @@
             renderReasonInfo(denyReasonData);
             renderFailedLogins(denyReasonData);
         } catch (error) {
-            renderReasonInfo(denyErrorData(error));
+            const errData = denyErrorData(error);
+            errData.requestedUrl = originalUrl;
+            window.__denyReasonData = errData;
+            renderReasonInfo(errData);
             renderFailedLogins(null);
         }
     }
 
-    function denyErrorData(error) {
-        if (error && (error.status === 401 || error.code === 'missing_access_jwt')) {
-            return {
-                error: 'No Cloudflare Access session on this page',
-                hint: 'Your identity could not be verified because this page is not being served behind Cloudflare Access. The deny reason only works when the page is deployed on a domain protected by Access in the same Zero Trust organization as the application you were blocked from (for example https://access.example.com/cf-access/). If you are seeing this on a *.workers.dev URL, that is the cause — bind the Worker to your Access-protected domain and point the Access block-page redirects there.'
-            };
-        }
-        if (error && (error.status === 500 || error.code === 'identity_unavailable')) {
-            return {
-                error: 'Access session could not be resolved',
-                hint: 'The worker could not read your identity. This happens when the page is not deployed on an Access-protected custom domain — /cdn-cgi/access/get-identity does not exist on *.workers.dev. If you are the administrator, bind the Worker to your domain behind Access and open the page from there.'
-            };
-        }
-        return { error: 'Failed to load deny reason' };
-    }
-
     async function loadData() {
         try {
-            // Load the deny reason alongside user details
             loadDenyReason();
 
-            // Fetch combined user details (identity + device + posture)
             const userDetailsResponse = await fetch('/cf-access/api/userdetails');
-            
+
             if (!userDetailsResponse.ok) {
                 throw new Error(`User details fetch failed: ${userDetailsResponse.status}`);
             }
-            
+
             const combinedData = await userDetailsResponse.json();
-            
-            // Extract data from combined response
             const identityData = combinedData.identity || {};
             const apiDeviceData = combinedData.device || {};
             const apiPostureData = combinedData.posture || {};
-            
-            // Extract device_id from JWT token
+
             let deviceId = null;
             const cookies = document.cookie.split(';');
             const cfAuthCookie = cookies.find(c => c.trim().startsWith('CF_Authorization='));
@@ -1345,8 +1249,7 @@
                 const token = cfAuthCookie.split('=')[1];
                 deviceId = getDeviceIdFromToken(token);
             }
-            
-            // Display combined data in debug section with syntax highlighting
+
             const debugJson = document.getElementById('debug-json');
             const debugData = {
                 identity: identityData,
@@ -1356,17 +1259,16 @@
                 denyReason: window.__denyReasonData || null
             };
             debugJson.innerHTML = syntaxHighlightJSON(debugData);
-            
-            // Process data with individual error handling
+
             const [warpData, deviceData, postureData] = await Promise.all([
                 Promise.resolve().then(() => getWarpInfo(identityData)).catch(err => {
-                    return { error: 'Failed to load user information' };
+                    return { error: 'Failed to load your details' };
                 }),
                 Promise.resolve().then(() => getDeviceInfo(identityData, deviceId, apiDeviceData)).catch(err => {
-                    return { error: 'Failed to load device information' };
+                    return { error: 'Failed to load device details' };
                 }),
                 Promise.resolve().then(() => getPostureInfo(identityData, apiPostureData)).catch(err => {
-                    return { error: 'Failed to load posture information' };
+                    return { error: 'Failed to load posture' };
                 })
             ]);
 
@@ -1375,14 +1277,14 @@
             renderPostureInfo(postureData);
         } catch (error) {
             const debugJson = document.getElementById('debug-json');
-            debugJson.innerHTML = syntaxHighlightJSON({ 
-                error: error.message, 
-                stack: error.stack 
+            debugJson.innerHTML = syntaxHighlightJSON({
+                error: error.message,
+                stack: error.stack
             });
-            
-            renderWarpInfo({ error: 'Failed to load user information' });
-            renderDeviceInfo({ error: 'Failed to load device information' });
-            renderPostureInfo({ error: 'Failed to load posture information' });
+
+            renderWarpInfo({ error: 'unavailable' });
+            renderDeviceInfo({ error: 'unavailable' });
+            renderPostureInfo({ error: 'unavailable' });
         }
     }
 
