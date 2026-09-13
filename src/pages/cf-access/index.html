@@ -462,6 +462,39 @@
         background: color-mix(in srgb, var(--muted) 12%, transparent);
     }
 
+    .posture-summary {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 12px 0 14px;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .posture-toggle {
+        margin-top: 14px;
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        font-family: var(--font-mono);
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        color: var(--amber-ink);
+    }
+
+    .posture-toggle:hover {
+        text-decoration: underline;
+    }
+
+    .cred-row.is-extra {
+        display: none;
+    }
+
+    #posture-content[data-expanded="true"] .cred-row.is-extra {
+        display: grid;
+    }
+
     .attempts-table {
         width: 100%;
         border-collapse: collapse;
@@ -1037,6 +1070,8 @@
             credRow('Device ID', data.deviceId || '—');
     }
 
+    const POSTURE_COLLAPSE_AFTER = 8;
+
     function renderPostureInfo(data) {
         if (data.error) {
             credError('posture-content');
@@ -1048,20 +1083,40 @@
             target.innerHTML = credRow('Status', 'No posture data reported');
             return;
         }
-        target.innerHTML = checks.map(c => {
-            let pillClass, pillText;
-            if (c.success) {
-                pillClass = 'pill--ok';
-                pillText = 'Passed';
-            } else if (c.error && String(c.error).toLowerCase().includes('not checked')) {
-                pillClass = 'pill--muted';
-                pillText = 'Not checked';
-            } else {
-                pillClass = 'pill--fail';
-                pillText = 'Failed';
-            }
-            return '<div class="cred-row"><span class="cred-label">' + esc(c.name) + '</span><span class="pill ' + pillClass + '">' + pillText + '</span></div>';
+
+        const summary = data.summary || {};
+        const summaryHtml =
+            '<div class="posture-summary">' +
+            '<span class="pill pill--fail">' + (summary.failed || 0) + ' failed</span>' +
+            '<span class="pill pill--ok">' + (summary.passed || 0) + ' passed</span>' +
+            '<span class="pill pill--muted">' + (summary.notChecked || 0) + ' not checked</span>' +
+            '</div>';
+
+        const stateMeta = {
+            pass: { cls: 'pill--ok', text: 'Passed' },
+            skipped: { cls: 'pill--muted', text: 'Not checked' },
+            fail: { cls: 'pill--fail', text: 'Failed' }
+        };
+        const rowsHtml = checks.map((c, i) => {
+            const meta = stateMeta[c.state] || (c.success ? stateMeta.pass : stateMeta.fail);
+            const extraClass = i >= POSTURE_COLLAPSE_AFTER ? ' is-extra' : '';
+            return '<div class="cred-row' + extraClass + '"><span class="cred-label">' + esc(c.name) + '</span><span class="pill ' + meta.cls + '">' + meta.text + '</span></div>';
         }).join('');
+
+        let toggleHtml = '';
+        if (checks.length > POSTURE_COLLAPSE_AFTER) {
+            const showText = 'Show all ' + checks.length + ' rules';
+            toggleHtml = '<button type="button" class="posture-toggle" data-show="' + esc(showText) + '" onclick="togglePostureRules(this)">' + esc(showText) + '</button>';
+        }
+
+        target.innerHTML = summaryHtml + rowsHtml + toggleHtml;
+    }
+
+    function togglePostureRules(btn) {
+        const list = document.getElementById('posture-content');
+        const wasExpanded = list.getAttribute('data-expanded') === 'true';
+        list.setAttribute('data-expanded', wasExpanded ? 'false' : 'true');
+        btn.textContent = wasExpanded ? (btn.getAttribute('data-show') || 'Show all rules') : 'Show fewer';
     }
 
     function syntaxHighlightJSON(obj) {

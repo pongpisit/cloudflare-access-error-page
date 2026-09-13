@@ -96,6 +96,8 @@ Evaluation is best-effort: Cloudflare does not expose which specific policy fail
 
 **Posture response shapes:** the device posture API returns a map keyed by rule ID (`result` object whose entries carry `rule_name`, `success`, and `error`), while some deployments expose the legacy `result.checks` array. Both the worker (`handleDenyReason`) and the page (`postureinfo.js`) accept either shape and read the display name from `rule_name`. Rules with `error: "Rule was not checked"` (the rule targets a different platform, e.g. an iOS rule on a Windows device) are rendered as *Not checked* and excluded from the failing-checks list so users are not told they failed a rule that never applied.
 
+**Scaling with many rules:** the page is built for arbitrarily large rule sets. `postureinfo.js` normalizes every rule into a `pass` / `fail` / `skipped` state, sorts failed-first, and computes a summary; the Posture section shows a *X failed · Y passed · Z not checked* summary strip and collapses lists longer than 8 rows behind a *Show all N rules* toggle. The worker's reason sentences cap the failing-check list at five names plus "and N more" (`summarizeCheckNames`), so the verdict paragraph stays readable no matter how many rules fail. The page and scripts are served with a 5-minute cache so deploys reach users quickly.
+
 ## Worker Implementation
 
 ### Route Handling

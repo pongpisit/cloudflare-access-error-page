@@ -394,7 +394,7 @@ async function handleDenyReason(request, env) {
           const ctx = buildEvalContext(email, userGroups, clientCountry, clientIp);
           const outcome = evaluateAccessPolicies(policies, groupsMap, ctx);
           const postureNote = failingPostureChecks.length
-            ? ` Your device is also failing these posture checks: ${failingPostureChecks.map(c => c.name).join(', ')}.`
+            ? ` Your device is also failing these posture checks: ${summarizeCheckNames(failingPostureChecks)}.`
             : '';
 
           if (outcome.matchedDeny) {
@@ -444,7 +444,7 @@ async function handleDenyReason(request, env) {
         type: 'posture_check_failed',
         errorCode: 10204,
         headline: 'Your device failed required security checks',
-        details: `Your device did not pass: ${failingPostureChecks.map(c => c.name).join(', ')}. Fix these checks (for example, enable the Cloudflare One client, keep CrowdStrike running, or update your OS) and try again.`,
+        details: `Your device did not pass: ${summarizeCheckNames(failingPostureChecks)}. Fix these checks (for example, enable the Cloudflare One client, keep CrowdStrike running, or update your OS) and try again.`,
       };
     } else if (app) {
       reason = {
@@ -940,6 +940,12 @@ async function fetchAppNames(accountId, appIds, token) {
   return names;
 }
 
+function summarizeCheckNames(checks, limit = 5) {
+  const names = checks.map(c => c.name);
+  if (names.length <= limit) return names.join(', ');
+  return names.slice(0, limit).join(', ') + `, and ${names.length - limit} more`;
+}
+
 function buildLimitedReasonDetails(capabilities, failingPostureChecks, originalUrl) {
   let details = 'You were denied by a Cloudflare Access policy, but detailed policy information is not available for this request.';
   if (originalUrl) {
@@ -964,7 +970,7 @@ function serveAccessPage(url) {
   return new Response(accessPageHTML, {
     headers: {
       'content-type': 'text/html;charset=UTF-8',
-      'cache-control': 'public, max-age=3600',
+      'cache-control': 'public, max-age=300',
     },
   });
 }
@@ -976,7 +982,7 @@ function serveWarpInfoScript() {
   return new Response(warpInfoJS, {
     headers: {
       'content-type': 'application/javascript;charset=UTF-8',
-      'cache-control': 'public, max-age=3600',
+      'cache-control': 'public, max-age=300',
     },
   });
 }
@@ -988,7 +994,7 @@ function serveDeviceInfoScript() {
   return new Response(deviceInfoJS, {
     headers: {
       'content-type': 'application/javascript;charset=UTF-8',
-      'cache-control': 'public, max-age=3600',
+      'cache-control': 'public, max-age=300',
     },
   });
 }
@@ -1000,7 +1006,7 @@ function servePostureInfoScript() {
   return new Response(postureInfoJS, {
     headers: {
       'content-type': 'application/javascript;charset=UTF-8',
-      'cache-control': 'public, max-age=3600',
+      'cache-control': 'public, max-age=300',
     },
   });
 }
@@ -1012,7 +1018,7 @@ function serveDenyReasonScript() {
   return new Response(denyReasonJS, {
     headers: {
       'content-type': 'application/javascript;charset=UTF-8',
-      'cache-control': 'public, max-age=3600',
+      'cache-control': 'public, max-age=300',
     },
   });
 }

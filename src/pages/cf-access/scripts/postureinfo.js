@@ -29,14 +29,35 @@ async function getPostureInfo(identityData, apiPostureData) {
 
         const checks = rawChecks
             .filter(check => check && typeof check === 'object')
-            .map(check => ({
-                name: check.rule_name || check.name || check.type || 'unnamed check',
-                success: check.success === true,
-                error: check.error || null,
-                type: check.type || null
-            }));
+            .map(check => {
+                let state;
+                if (check.success === true) {
+                    state = 'pass';
+                } else if (String(check.error || '').toLowerCase().includes('not checked')) {
+                    state = 'skipped';
+                } else {
+                    state = 'fail';
+                }
+                return {
+                    name: check.rule_name || check.name || check.type || 'unnamed check',
+                    type: check.type || null,
+                    error: check.error || null,
+                    success: check.success === true,
+                    state
+                };
+            });
 
-        return { checks };
+        const stateOrder = { fail: 0, skipped: 1, pass: 2 };
+        checks.sort((a, b) => (stateOrder[a.state] !== undefined ? stateOrder[a.state] : 3) - (stateOrder[b.state] !== undefined ? stateOrder[b.state] : 3));
+
+        const summary = {
+            total: checks.length,
+            failed: checks.filter(c => c.state === 'fail').length,
+            passed: checks.filter(c => c.state === 'pass').length,
+            notChecked: checks.filter(c => c.state === 'skipped').length
+        };
+
+        return { checks, summary };
     } catch (error) {
         console.error("Error processing posture info:", error);
         throw error;

@@ -41,7 +41,7 @@ A single-column incident record, ordered for a person who just lost access — v
 
 - **Status stamp** — quick-scan verdict (*Blocked by policy*, *Not on the allow list*, *Device failed checks*, …) with the Cloudflare error code
 - **What to do next** — numbered steps written for the person staring at the page
-- **Your credentials** — full-width sections with horizontal label → value rows: **You** (name, email, groups, country, connection IP, Cloudflare One client status), **Device** (name, type, model, OS version, serial number, MAC address, IP address, client version, last seen, device ID), **Posture** — *every* posture rule with a **Passed / Failed / Not checked** pill (platform-mismatched rules, e.g. an iOS rule on a Windows device, show as *Not checked*)
+- **Your credentials** — full-width sections with horizontal label → value rows: **You** (name, email, groups, country, connection IP, Cloudflare One client status), **Device** (name, type, model, OS version, serial number, MAC address, IP address, client version, last seen, device ID), **Posture** — built for any number of rules: a summary strip (*X failed · Y passed · Z not checked*), rules sorted failed-first, and lists longer than 8 collapse behind a *Show all N rules* toggle. Platform-mismatched rules (e.g. an iOS rule on a Windows device) show as *Not checked*
 - **Recent failed sign-ins** — the user's failed Access login events from the last 15 minutes (application, identity provider, country, reason)
 - **Actions** — *Try the app again*, *Email IT*, *Copy details for IT*, prefilled with the full context (reason, error code, application, email, failing checks)
 - Light/dark themes, keyboard accessible (WCAG 2.1 AA patterns), zero external CDN dependencies (all fonts and styles are local)
