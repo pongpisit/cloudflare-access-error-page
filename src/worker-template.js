@@ -357,12 +357,21 @@ async function handleDenyReason(request, env) {
   if (bearerToken && accountId && deviceId) {
     try {
       const postureData = await fetchDevicePosture(accountId, deviceId, bearerToken);
-      const checks = postureData && postureData.result && Array.isArray(postureData.result.checks) ? postureData.result.checks : null;
+      const postureResult = postureData && postureData.result ? postureData.result : null;
+      let checks = null;
+      if (Array.isArray(postureResult)) {
+        checks = postureResult;
+      } else if (postureResult && Array.isArray(postureResult.checks)) {
+        checks = postureResult.checks;
+      } else if (postureResult && typeof postureResult === 'object') {
+        checks = Object.values(postureResult);
+      }
       if (checks) {
         capabilities.devicePosture = true;
         failingPostureChecks = checks
-          .filter(check => check && check.success === false)
-          .map(check => ({ name: check.name || check.id || 'unnamed check', type: check.type || null }));
+          .filter(check => check && typeof check === 'object' && check.success === false)
+          .filter(check => !String(check.error || '').toLowerCase().includes('not checked'))
+          .map(check => ({ name: check.rule_name || check.name || check.id || 'unnamed check', type: check.type || null }));
       }
     } catch (error) {
       console.error("Deny reason: posture fetch failed:", error.message);

@@ -4,19 +4,37 @@ async function getPostureInfo(identityData, apiPostureData) {
             throw new Error(identityData.error);
         }
 
-        const device = identityData.device_sessions?.[0]?.device || {};
-        let devicePosture = identityData.device_posture || device.device_posture || {};
+        let devicePosture = null;
 
-        if (apiPostureData?.result) {
+        if (apiPostureData && apiPostureData.result) {
             devicePosture = apiPostureData.result;
         }
 
-        const rawChecks = Array.isArray(devicePosture.checks) ? devicePosture.checks : [];
+        if (!devicePosture) {
+            const identityPosture = identityData.devicePosture || identityData.device_posture;
+            const device = identityData.device_sessions && identityData.device_sessions[0]
+                ? identityData.device_sessions[0].device
+                : {};
+            devicePosture = identityPosture || device.device_posture || {};
+        }
 
-        const checks = rawChecks.map(check => ({
-            name: check.name || check.type || 'unnamed check',
-            success: check.success === true
-        }));
+        let rawChecks = [];
+        if (Array.isArray(devicePosture)) {
+            rawChecks = devicePosture;
+        } else if (Array.isArray(devicePosture.checks)) {
+            rawChecks = devicePosture.checks;
+        } else if (devicePosture && typeof devicePosture === 'object') {
+            rawChecks = Object.values(devicePosture);
+        }
+
+        const checks = rawChecks
+            .filter(check => check && typeof check === 'object')
+            .map(check => ({
+                name: check.rule_name || check.name || check.type || 'unnamed check',
+                success: check.success === true,
+                error: check.error || null,
+                type: check.type || null
+            }));
 
         return { checks };
     } catch (error) {

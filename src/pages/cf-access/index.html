@@ -1010,6 +1010,8 @@
             credRow('Name', data.userName || '—') +
             credRow('Email', data.userEmail || '—') +
             credRow('Groups', groups) +
+            credRow('Country', data.userCountry || '—') +
+            credRow('Connection IP', data.userIp || '—') +
             credPill('Cloudflare One client', 'Connected', 'Not connected', data.isWarpEnabled, true);
     }
 
@@ -1018,12 +1020,21 @@
             credError('device-content');
             return;
         }
+        const deviceType = data.deviceType
+            ? data.deviceType.charAt(0).toUpperCase() + data.deviceType.slice(1)
+            : '—';
+        const lastSeen = data.lastSeen ? new Date(data.lastSeen).toLocaleString() : '—';
         document.getElementById('device-content').innerHTML =
-            credRow('Device ID', data.deviceId || '—') +
             credRow('Device', data.deviceName || '—') +
+            credRow('Type', deviceType) +
             credRow('Model', data.deviceModel || '—') +
             credRow('OS version', data.deviceOsVersion || '—') +
-            credRow('Serial number', data.deviceSerial || '—');
+            credRow('Serial number', data.deviceSerial || '—') +
+            credRow('MAC address', data.deviceMac || '—') +
+            credRow('IP address', data.deviceIp || '—') +
+            credRow('Client version', data.clientVersion || '—') +
+            credRow('Last seen', lastSeen) +
+            credRow('Device ID', data.deviceId || '—');
     }
 
     function renderPostureInfo(data) {
@@ -1037,9 +1048,20 @@
             target.innerHTML = credRow('Status', 'No posture data reported');
             return;
         }
-        target.innerHTML = checks.map(c =>
-            credPill(c.name, 'Passed', 'Failed', c.success === true, false)
-        ).join('');
+        target.innerHTML = checks.map(c => {
+            let pillClass, pillText;
+            if (c.success) {
+                pillClass = 'pill--ok';
+                pillText = 'Passed';
+            } else if (c.error && String(c.error).toLowerCase().includes('not checked')) {
+                pillClass = 'pill--muted';
+                pillText = 'Not checked';
+            } else {
+                pillClass = 'pill--fail';
+                pillText = 'Failed';
+            }
+            return '<div class="cred-row"><span class="cred-label">' + esc(c.name) + '</span><span class="pill ' + pillClass + '">' + pillText + '</span></div>';
+        }).join('');
     }
 
     function syntaxHighlightJSON(obj) {

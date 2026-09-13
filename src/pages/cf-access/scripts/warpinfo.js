@@ -21,7 +21,9 @@ async function getWarpInfo(identityData) {
       userName: identityData.name || "N/A",
       userEmail: identityData.email || "N/A",
       isWarpEnabled: warpStatus,
-      userGroups: userGroups
+      userGroups: userGroups,
+      userCountry: (identityData.geo && identityData.geo.country) || null,
+      userIp: identityData.ip || null
     };
     
     return result;

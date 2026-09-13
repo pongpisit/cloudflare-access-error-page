@@ -94,6 +94,8 @@ Page renders the deny reason, details, and next steps
 
 Evaluation is best-effort: Cloudflare does not expose which specific policy failed, so the worker derives the reason category from the app's policies and the user's identity. **Policy internals (names, rules, requirement text) are never included in the response** — the client only receives the reason category, the user's own identity, device, and posture status. The Posture card renders every check returned by the device posture API, and the user-facing copy for each reason type avoids naming policies or quoting their rules.
 
+**Posture response shapes:** the device posture API returns a map keyed by rule ID (`result` object whose entries carry `rule_name`, `success`, and `error`), while some deployments expose the legacy `result.checks` array. Both the worker (`handleDenyReason`) and the page (`postureinfo.js`) accept either shape and read the display name from `rule_name`. Rules with `error: "Rule was not checked"` (the rule targets a different platform, e.g. an iOS rule on a Windows device) are rendered as *Not checked* and excluded from the failing-checks list so users are not told they failed a rule that never applied.
+
 ## Worker Implementation
 
 ### Route Handling
