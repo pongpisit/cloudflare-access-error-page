@@ -1046,12 +1046,15 @@
     }
 
     function credError(targetId) {
-        document.getElementById(targetId).innerHTML =
+        const el = document.getElementById(targetId);
+        el.classList.remove('loading-state');
+        el.innerHTML =
             '<div class="cred-row"><span class="cred-label">Status</span><span class="pill pill--muted">Unavailable</span></div>';
     }
 
     function renderWarpInfo(data) {
         const target = document.getElementById('you-content');
+        target.classList.remove('loading-state');
         if (data.error) {
             credError('you-content');
             return;
@@ -1067,6 +1070,8 @@
     }
 
     function renderDeviceInfo(data) {
+        const target = document.getElementById('device-content');
+        target.classList.remove('loading-state');
         if (data.error) {
             credError('device-content');
             return;
@@ -1075,7 +1080,7 @@
             ? data.deviceType.charAt(0).toUpperCase() + data.deviceType.slice(1)
             : '—';
         const lastSeen = data.lastSeen ? new Date(data.lastSeen).toLocaleString() : '—';
-        document.getElementById('device-content').innerHTML =
+        target.innerHTML =
             credRow('Device', data.deviceName || '—') +
             credRow('Type', deviceType) +
             credRow('Model', data.deviceModel || '—') +
@@ -1091,12 +1096,13 @@
     const POSTURE_COLLAPSE_AFTER = 8;
 
     function renderPostureInfo(data) {
+        const target = document.getElementById('posture-content');
+        target.classList.remove('loading-state');
         if (data.error) {
             credError('posture-content');
             return;
         }
         const checks = Array.isArray(data.checks) ? data.checks : [];
-        const target = document.getElementById('posture-content');
         if (!checks.length) {
             target.innerHTML = credRow('Status', 'No posture data reported');
             return;
