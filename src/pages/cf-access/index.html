@@ -378,16 +378,16 @@
 
     .creds {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: 1fr;
         gap: 18px;
-        margin-bottom: 18px;
+        margin-bottom: 24px;
     }
 
     .cred {
         border: 1px solid var(--line);
         border-radius: 12px;
         background: var(--card);
-        padding: 24px;
+        padding: 22px 28px 24px;
     }
 
     .cred-title {
@@ -397,19 +397,18 @@
         letter-spacing: 0.16em;
         text-transform: uppercase;
         color: var(--faint);
-        margin-bottom: 14px;
+        padding-bottom: 12px;
+        margin-bottom: 4px;
+        border-bottom: 1px solid var(--line-strong);
     }
 
     .cred-row {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        padding: 8px 0;
+        display: grid;
+        grid-template-columns: minmax(130px, 220px) 1fr;
+        column-gap: 24px;
+        align-items: baseline;
+        padding: 11px 0;
         border-bottom: 1px solid var(--line);
-    }
-
-    .cred-row:first-of-type {
-        border-top: 1px solid var(--line);
     }
 
     .cred-row:last-of-type {
@@ -600,8 +599,13 @@
             padding: 40px 24px 48px;
         }
 
-        .creds {
-            grid-template-columns: 1fr;
+        .cred {
+            padding: 18px 20px 20px;
+        }
+
+        .cred-row {
+            grid-template-columns: minmax(104px, 42%) 1fr;
+            column-gap: 16px;
         }
 
         .docket {
