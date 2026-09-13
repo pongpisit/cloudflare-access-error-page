@@ -411,6 +411,19 @@
         border-bottom: 1px solid var(--line);
     }
 
+    .cred-row--status {
+        grid-template-columns: 1fr auto;
+        column-gap: 16px;
+        align-items: center;
+    }
+
+    .cred-name {
+        font-family: var(--font-mono);
+        font-size: 13px;
+        color: var(--ink);
+        overflow-wrap: anywhere;
+    }
+
     .cred-row:last-of-type {
         border-bottom: none;
     }
@@ -639,6 +652,11 @@
         .cred-row {
             grid-template-columns: minmax(104px, 42%) 1fr;
             column-gap: 16px;
+        }
+
+        .cred-row--status {
+            grid-template-columns: 1fr auto;
+            column-gap: 12px;
         }
 
         .docket {
@@ -1100,7 +1118,7 @@
         const rowsHtml = checks.map((c, i) => {
             const meta = stateMeta[c.state] || (c.success ? stateMeta.pass : stateMeta.fail);
             const extraClass = i >= POSTURE_COLLAPSE_AFTER ? ' is-extra' : '';
-            return '<div class="cred-row' + extraClass + '"><span class="cred-label">' + esc(c.name) + '</span><span class="pill ' + meta.cls + '">' + meta.text + '</span></div>';
+            return '<div class="cred-row cred-row--status' + extraClass + '"><span class="cred-name">' + esc(c.name) + '</span><span class="pill ' + meta.cls + '">' + meta.text + '</span></div>';
         }).join('');
 
         let toggleHtml = '';
